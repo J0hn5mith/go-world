@@ -9,17 +9,20 @@ import (
 	"fmt"
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"go/build"
-	"image"
-	"image/draw"
-	_ "image/png"
+	//"image"
+	//"image/draw"
+	//_ "image/png"
 	"log"
 	"os"
 	"runtime"
 	"strings"
+	"github.com/go-gl/glfw/v3.1/glfw"
+	"math/rand"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 const windowWidth = 800
-const windowHeight = 600
+const windowHeight = 800
 
 func init() {
 	// GLFW event handling must run on the main OS thread
@@ -42,7 +45,6 @@ func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error)
 	}
 
 	program := gl.CreateProgram()
-
 	gl.AttachShader(program, vertexShader)
 	gl.AttachShader(program, fragmentShader)
 	gl.LinkProgram(program)
@@ -65,98 +67,44 @@ func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error)
 	return program, nil
 }
 
-func compileShader(source string, shaderType uint32) (uint32, error) {
-	shader := gl.CreateShader(shaderType)
 
-	csources, free := gl.Strs(source)
-	gl.ShaderSource(shader, 1, csources, nil)
-	free()
-	gl.CompileShader(shader)
+//func newTexture(file string) (uint32, error) {
+	//imgFile, err := os.Open(file)
+	//if err != nil {
+		//return 0, fmt.Errorf("texture %q not found on disk: %v", file, err)
+	//}
+	//img, _, err := image.Decode(imgFile)
+	//if err != nil {
+		//return 0, err
+	//}
 
-	var status int32
-	gl.GetShaderiv(shader, gl.COMPILE_STATUS, &status)
-	if status == gl.FALSE {
-		var logLength int32
-		gl.GetShaderiv(shader, gl.INFO_LOG_LENGTH, &logLength)
+	//rgba := image.NewRGBA(img.Bounds())
+	//if rgba.Stride != rgba.Rect.Size().X*4 {
+		//return 0, fmt.Errorf("unsupported stride")
+	//}
+	//draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
 
-		log := strings.Repeat("\x00", int(logLength+1))
-		gl.GetShaderInfoLog(shader, logLength, nil, gl.Str(log))
+	//var texture uint32
+	//gl.GenTextures(1, &texture)
+	//gl.ActiveTexture(gl.TEXTURE0)
+	//gl.BindTexture(gl.TEXTURE_2D, texture)
+	//gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+	//gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+	//gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+	//gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+	//gl.TexImage2D(
+		//gl.TEXTURE_2D,
+		//0,
+		//gl.RGBA,
+		//int32(rgba.Rect.Size().X),
+		//int32(rgba.Rect.Size().Y),
+		//0,
+		//gl.RGBA,
+		//gl.UNSIGNED_BYTE,
+		//gl.Ptr(rgba.Pix))
 
-		return 0, fmt.Errorf("failed to compile %v: %v", source, log)
-	}
-
-	return shader, nil
-}
-
-func newTexture(file string) (uint32, error) {
-	imgFile, err := os.Open(file)
-	if err != nil {
-		return 0, fmt.Errorf("texture %q not found on disk: %v", file, err)
-	}
-	img, _, err := image.Decode(imgFile)
-	if err != nil {
-		return 0, err
-	}
-
-	rgba := image.NewRGBA(img.Bounds())
-	if rgba.Stride != rgba.Rect.Size().X*4 {
-		return 0, fmt.Errorf("unsupported stride")
-	}
-	draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
-
-	var texture uint32
-	gl.GenTextures(1, &texture)
-	gl.ActiveTexture(gl.TEXTURE0)
-	gl.BindTexture(gl.TEXTURE_2D, texture)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-	gl.TexImage2D(
-		gl.TEXTURE_2D,
-		0,
-		gl.RGBA,
-		int32(rgba.Rect.Size().X),
-		int32(rgba.Rect.Size().Y),
-		0,
-		gl.RGBA,
-		gl.UNSIGNED_BYTE,
-		gl.Ptr(rgba.Pix))
-
-	return texture, nil
-}
-
-var vertexShader = `
-#version 330
-
-uniform mat4 projection;
-uniform mat4 camera;
-uniform mat4 model;
-
-in vec3 vert;
-in vec2 vertTexCoord;
-
-out vec2 fragTexCoord;
-
-void main() {
-    fragTexCoord = vertTexCoord;
-    gl_Position = projection * camera * model * vec4(vert, 1);
-}
-` + "\x00"
-
-var fragmentShader = `
-#version 330
-
-uniform sampler2D tex;
-
-in vec2 fragTexCoord;
-
-out vec4 outputColor;
-
-void main() {
-    outputColor = texture(tex, fragTexCoord);
-}
-` + "\x00"
+	//return texture, nil
+//}
 
 
 // Set the working directory to the root of Go package, so that its assets can be accessed.
@@ -180,4 +128,88 @@ func importPathToDir(importPath string) (string, error) {
 		return "", err
 	}
 	return p.Dir, nil
+}
+
+func render() {
+	if err := glfw.Init(); err != nil {
+		log.Fatalln("failed to initialize glfw:", err)
+	}
+	defer glfw.Terminate() // What does the defer keyword mean?
+	window, err := createWindow()
+
+	// Initialize Glow
+	if err := gl.Init(); err != nil {
+		panic(err)
+	}
+
+	// Configure the vertex and fragment shaders
+	program, err := newProgram(vertexShader, fragmentShader)
+	if err != nil {
+		panic(err)
+	}
+
+	gl.UseProgram(program)
+
+
+	model := mgl32.Ident4()
+	modelUniform := gl.GetUniformLocation(program, gl.Str("model\x00"))
+	gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
+
+	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
+
+
+	camera := NewCamera(program)
+	scene := NewScene(program)
+	renderer := Renderer{camera}
+	object := NewObject(createCircleGeometry(60))
+	object.setScale(0.1)
+	object.configure(scene.program)
+	scene.addObject(object)
+
+	object2 := NewObject(createTriangle2DGeometry(2))
+	object2.setScale(0.1)
+	object2.configure(scene.program)
+	scene.addObject(object2)
+
+    //particleSystem := NewParticleSystem(scene)
+    //createParticle(particleSystem)
+    //createParticle(particleSystem)
+    //createParticle(particleSystem)
+
+
+	for !window.ShouldClose() {
+
+		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+        //particleSystem.animate(0.05)
+        renderer.render(scene)
+
+		// Maintenance
+		window.SwapBuffers()
+		glfw.PollEvents()
+	}
+
+}
+
+func createWindow() (*glfw.Window, error) {
+	glfw.WindowHint(glfw.Resizable, glfw.False)
+	glfw.WindowHint(glfw.ContextVersionMajor, 4)
+	glfw.WindowHint(glfw.ContextVersionMinor, 1)
+	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
+	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
+	window, err := glfw.CreateWindow(windowWidth, windowHeight, "Cube", nil, nil)
+	if err != nil {
+		panic(err)
+	}
+	window.MakeContextCurrent()
+	return window, err
+}
+
+func createParticle(particleSystem *ParticleSystem) *Particle{
+    particle := particleSystem.newParticle()
+	particle.object.setScale(.5)
+	particle.velocity[0] = rand.Float32()-0.5
+	particle.velocity[1] = rand.Float32()-0.5
+	particle.velocity[2] = rand.Float32()-0.5
+    return particle
 }

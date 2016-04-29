@@ -15,6 +15,7 @@ type Object struct{
     modelUniform int32
 	angle float64
     vao uint32
+    vbo uint32
 }
 
 func NewObject(geometry *Geometry) *Object {
@@ -36,10 +37,9 @@ func (object *Object) setScale(scale float32) {
 func (object *Object)configure(program uint32){
     // Create the glsl uniforms for communicating with the shader
 	// Configure the vertex data
-	object.modelUniform = gl.GetUniformLocation(program, gl.Str("model\x00"))
-	gl.UniformMatrix4fv(object.modelUniform, 1, false, &object.model[0])
-
-	gl.BindFragDataLocation(program, 171, gl.Str("outputColor\x00"))
+	//object.modelUniform = gl.GetUniformLocation(program, gl.Str("model\x00"))
+	//gl.UniformMatrix4fv(object.modelUniform, 1, false, &object.model[0])
+	//gl.BindFragDataLocation(program, 171, gl.Str("outputColor\x00"))
 
 	gl.GenVertexArrays(1, &object.vao)
 	gl.BindVertexArray(object.vao)
@@ -47,18 +47,15 @@ func (object *Object)configure(program uint32){
 	var vbo uint32
 	gl.GenBuffers(1, &vbo)
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
-	gl.BufferData(gl.ARRAY_BUFFER, len(object.geometry.vertices)*3, gl.Ptr(object.geometry.vertices), gl.STATIC_DRAW)
+	gl.BufferData(gl.ARRAY_BUFFER, len(object.geometry.vertices)*6, gl.Ptr(object.geometry.vertices), gl.STATIC_DRAW)
+    object.vbo = vbo
 
-    vertAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vert\x00")))
+    vertAttrib := uint32(gl.GetAttribLocation(program, gl.Str("position\x00")))
     gl.EnableVertexAttribArray(vertAttrib)
     gl.VertexAttribPointer(vertAttrib, 3, gl.FLOAT, false, 0, gl.PtrOffset(0))
 
-    texCoordAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vertTexCoord\x00")))
-    gl.EnableVertexAttribArray(texCoordAttrib)
-    gl.VertexAttribPointer(texCoordAttrib, 2, gl.FLOAT, false, 5*4, gl.PtrOffset(3*4))
-
 	// Configure global settings
-	gl.Enable(gl.DEPTH_TEST)
-	gl.DepthFunc(gl.LESS)
+	//gl.Enable(gl.DEPTH_TEST)
+	//gl.DepthFunc(gl.LESS)
 	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
 }

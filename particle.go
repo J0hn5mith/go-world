@@ -13,7 +13,7 @@ type Particle struct {
 func NewParticle(scene *Scene) *Particle {
 	particle := new(Particle)
 
-	particle.object = NewObject(createOctahedronGeometry())
+	particle.object = NewObject(createCircleGeometry(60))
 	particle.object.configure(scene.program)
 	scene.addObject(particle.object)
 
