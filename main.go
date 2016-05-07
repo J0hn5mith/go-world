@@ -3,69 +3,70 @@
 // license that can be found in the LICENSE file.
 
 // Renders a textured spinning cube using GLFW 3.1 and OpenGL 4.1 core forward-compatible profile.
-package main
+package go_world
 
-import (
-	"fmt"
-	"github.com/go-gl/gl/v4.1-core/gl"
-	"go/build"
-	//"image"
-	//"image/draw"
-	//_ "image/png"
-	"log"
-	"os"
-	"runtime"
-	"strings"
-	"github.com/go-gl/glfw/v3.1/glfw"
-	"math/rand"
-	"github.com/go-gl/mathgl/mgl32"
-)
+//import (
+	////"fmt"
+	//"github.com/go-gl/gl/v4.1-core/gl"
+	//"go/build"
+	////"image"
+	////"image/draw"
+	////_ "image/png"
+	//"log"
+	//"os"
+	//"runtime"
+	////"strings"
+	//"github.com/go-gl/glfw/v3.1/glfw"
+	//"math/rand"
+	//"github.com/go-gl/mathgl/mgl32"
+//)
 
-const windowWidth = 800
-const windowHeight = 800
+//const windowWidth = 800
+//const windowHeight = 800
 
-func init() {
-	// GLFW event handling must run on the main OS thread
-	runtime.LockOSThread()
-}
 
-func main() {
-    render()
-}
+//func init() {
+	//// GLFW event handling must run on the main OS thread
+	//runtime.LockOSThread()
+//}
 
-func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error) {
-	vertexShader, err := compileShader(vertexShaderSource, gl.VERTEX_SHADER)
-	if err != nil {
-		return 0, err
-	}
+//func main() {
+    //render()
+//}
 
-	fragmentShader, err := compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER)
-	if err != nil {
-		return 0, err
-	}
+//func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error) {
+	//vertexShader, err := compileShader(vertexShaderSource, gl.VERTEX_SHADER)
+	//if err != nil {
+		//return 0, err
+	//}
 
-	program := gl.CreateProgram()
-	gl.AttachShader(program, vertexShader)
-	gl.AttachShader(program, fragmentShader)
-	gl.LinkProgram(program)
+	//fragmentShader, err := compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER)
+	//if err != nil {
+		//return 0, err
+	//}
 
-	var status int32
-	gl.GetProgramiv(program, gl.LINK_STATUS, &status)
-	if status == gl.FALSE {
-		var logLength int32
-		gl.GetProgramiv(program, gl.INFO_LOG_LENGTH, &logLength)
+	//program := gl.CreateProgram()
+	//gl.AttachShader(program, vertexShader)
+	//gl.AttachShader(program, fragmentShader)
+	//gl.LinkProgram(program)
 
-		log := strings.Repeat("\x00", int(logLength+1))
-		gl.GetProgramInfoLog(program, logLength, nil, gl.Str(log))
+	//var status int32
+	//gl.GetProgramiv(program, gl.LINK_STATUS, &status)
+	//if status == gl.FALSE {
+		//var logLength int32
+		//gl.GetProgramiv(program, gl.INFO_LOG_LENGTH, &logLength)
 
-		return 0, fmt.Errorf("failed to link program: %v", log)
-	}
+		//log := strings.Repeat("\x00", int(logLength+1))
+		//gl.GetProgramInfoLog(program, logLength, nil, gl.Str(log))
 
-	gl.DeleteShader(vertexShader)
-	gl.DeleteShader(fragmentShader)
+		//return 0, fmt.Errorf("failed to link program: %v", log)
+	//}
 
-	return program, nil
-}
+	//gl.DeleteShader(vertexShader)
+	//gl.DeleteShader(fragmentShader)
+
+	//return program, nil
+//}
 
 
 //func newTexture(file string) (uint32, error) {
@@ -108,108 +109,108 @@ func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error)
 
 
 // Set the working directory to the root of Go package, so that its assets can be accessed.
-func init() {
-	dir, err := importPathToDir("github.com/go-gl/examples/glfw31-gl41core-cube")
-	if err != nil {
-		log.Fatalln("Unable to find Go package in your GOPATH, it's needed to load assets:", err)
-	}
-	err = os.Chdir(dir)
-	if err != nil {
-		log.Panicln("os.Chdir:", err)
-	}
-}
+//func init() {
+	//dir, err := importPathToDir("github.com/go-gl/examples/glfw31-gl41core-cube")
+	//if err != nil {
+		//log.Fatalln("Unable to find Go package in your GOPATH, it's needed to load assets:", err)
+	//}
+	//err = os.Chdir(dir)
+	//if err != nil {
+		//log.Panicln("os.Chdir:", err)
+	//}
+//}
 
 // importPathToDir resolves the absolute path from importPath.
 // There doesn't need to be a valid Go package inside that import path,
 // but the directory must exist.
-func importPathToDir(importPath string) (string, error) {
-	p, err := build.Import(importPath, "", build.FindOnly)
-	if err != nil {
-		return "", err
-	}
-	return p.Dir, nil
-}
+//func importPathToDir(importPath string) (string, error) {
+	//p, err := build.Import(importPath, "", build.FindOnly)
+	//if err != nil {
+		//return "", err
+	//}
+	//return p.Dir, nil
+//}
 
-func render() {
-	if err := glfw.Init(); err != nil {
-		log.Fatalln("failed to initialize glfw:", err)
-	}
-	defer glfw.Terminate() // What does the defer keyword mean?
-	window, err := createWindow()
+//func render() {
+	//if err := glfw.Init(); err != nil {
+		//log.Fatalln("failed to initialize glfw:", err)
+	//}
+	//defer glfw.Terminate() // What does the defer keyword mean?
+	//window, err := createWindow()
 
-	// Initialize Glow
-	if err := gl.Init(); err != nil {
-		panic(err)
-	}
+	//// Initialize Glow
+	//if err := gl.Init(); err != nil {
+		//panic(err)
+	//}
 
-	// Configure the vertex and fragment shaders
-	program, err := newProgram(vertexShader, fragmentShader)
-	if err != nil {
-		panic(err)
-	}
+	//// Configure the vertex and fragment shaders
+	//program, err := newProgram(vertexShader, fragmentShader)
+	//if err != nil {
+		//panic(err)
+	//}
 
-	gl.UseProgram(program)
-
-
-	model := mgl32.Ident4()
-	modelUniform := gl.GetUniformLocation(program, gl.Str("model\x00"))
-	gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
-
-	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
+	//gl.UseProgram(program)
 
 
-	camera := NewCamera(program)
-	scene := NewScene(program)
-	renderer := Renderer{camera}
-	object := NewObject(createCircleGeometry(60))
-	object.setScale(0.1)
-	object.configure(scene.program)
-	scene.addObject(object)
+	//model := mgl32.Ident4()
+	//modelUniform := gl.GetUniformLocation(program, gl.Str("model\x00"))
+	//gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
 
-	object2 := NewObject(createTriangle2DGeometry(2))
-	object2.setScale(0.1)
-	object2.configure(scene.program)
-	scene.addObject(object2)
-
-    //particleSystem := NewParticleSystem(scene)
-    //createParticle(particleSystem)
-    //createParticle(particleSystem)
-    //createParticle(particleSystem)
+	//gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
 
 
-	for !window.ShouldClose() {
+	//camera := NewCamera(program)
+	//scene := NewScene(program)
+	//renderer := Renderer{camera}
+	//object := NewObject(createCircleGeometry(60))
+	//object.setScale(0.1)
+	//object.configure(scene.program)
+	//scene.addObject(object)
 
-		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	//object2 := NewObject(createTriangle2DGeometry(2))
+	//object2.setScale(0.1)
+	//object2.configure(scene.program)
+	//scene.addObject(object2)
 
-        //particleSystem.animate(0.05)
-        renderer.render(scene)
+    ////particleSystem := NewParticleSystem(scene)
+    ////createParticle(particleSystem)
+    ////createParticle(particleSystem)
+    ////createParticle(particleSystem)
 
-		// Maintenance
-		window.SwapBuffers()
-		glfw.PollEvents()
-	}
 
-}
+	//for !window.ShouldClose() {
 
-func createWindow() (*glfw.Window, error) {
-	glfw.WindowHint(glfw.Resizable, glfw.False)
-	glfw.WindowHint(glfw.ContextVersionMajor, 4)
-	glfw.WindowHint(glfw.ContextVersionMinor, 1)
-	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
-	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
-	window, err := glfw.CreateWindow(windowWidth, windowHeight, "Cube", nil, nil)
-	if err != nil {
-		panic(err)
-	}
-	window.MakeContextCurrent()
-	return window, err
-}
+		//gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-func createParticle(particleSystem *ParticleSystem) *Particle{
-    particle := particleSystem.newParticle()
-	particle.object.setScale(.5)
-	particle.velocity[0] = rand.Float32()-0.5
-	particle.velocity[1] = rand.Float32()-0.5
-	particle.velocity[2] = rand.Float32()-0.5
-    return particle
-}
+        ////particleSystem.animate(0.05)
+        //renderer.render(scene)
+
+		//// Maintenance
+		//window.SwapBuffers()
+		//glfw.PollEvents()
+	//}
+
+//}
+
+//func createWindow() (*glfw.Window, error) {
+	//glfw.WindowHint(glfw.Resizable, glfw.False)
+	//glfw.WindowHint(glfw.ContextVersionMajor, 4)
+	//glfw.WindowHint(glfw.ContextVersionMinor, 1)
+	//glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
+	//glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
+	//window, err := glfw.CreateWindow(windowWidth, windowHeight, "Cube", nil, nil)
+	//if err != nil {
+		//panic(err)
+	//}
+	//window.MakeContextCurrent()
+	//return window, err
+//}
+
+//func createParticle(particleSystem *ParticleSystem) *Particle{
+    //particle := particleSystem.newParticle()
+	//particle.object.setScale(.5)
+	//particle.velocity[0] = rand.Float32()-0.5
+	//particle.velocity[1] = rand.Float32()-0.5
+	//particle.velocity[2] = rand.Float32()-0.5
+    //return particle
+//}

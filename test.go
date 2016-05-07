@@ -1,4 +1,4 @@
-package main
+package go_world
 //import (
     //"github.com/go-gl/mathgl/mgl32"
     //"fmt"
