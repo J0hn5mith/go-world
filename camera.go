@@ -10,11 +10,11 @@ type Camera struct {
     program    uint32
 }
 
-func NewCamera(program uint32) *Camera {
+func NewCamera(program uint32, windowWidth int , windowHeight int) *Camera {
     camera := new(Camera)
 	
 	//projection matrix
-	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 10.0)
+	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/float32(windowHeight), 0.1, 10.0)
 	projectionUniform := gl.GetUniformLocation(program, gl.Str("projection\x00"))
 	gl.UniformMatrix4fv(projectionUniform, 1, false, &projection[0])
 	
@@ -27,5 +27,3 @@ func NewCamera(program uint32) *Camera {
     camera.program = program
     return camera
 }
-
-

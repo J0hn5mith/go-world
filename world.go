@@ -5,13 +5,8 @@ import (
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/glfw/v3.1/glfw"
 	"github.com/go-gl/mathgl/mgl32"
-	//"log"
-	//"runtime"
 	"strings"
 )
-
-const windowWidth = 800
-const windowHeight = 800
 
 type World struct {
 	Scene   *Scene
@@ -20,9 +15,8 @@ type World struct {
 	program uint32
 }
 
-func StartWorld(window *glfw.Window) (Renderer, *World) {
+func StartWorld(window *glfw.Window) (*Renderer, *World) {
 
-	// Initialize Glow
 	if err := gl.Init(); err != nil {
 		panic(err)
 	}
@@ -37,20 +31,15 @@ func StartWorld(window *glfw.Window) (Renderer, *World) {
 	modelUniform := gl.GetUniformLocation(program, gl.Str("model\x00"))
 	gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
 
-	camera := NewCamera(program)
+    width, height := window.GetSize()
+	camera := NewCamera(program, width, height)
 	scene := NewScene(program)
-	renderer := Renderer{camera}
-
-	//object := NewObject(createCircleGeometry(60))
-	//object.setScale(0.1)
-	//object.configure(scene.program)
-	//scene.addObject(object)
+	renderer := NewRenderer(camera)
 
     world := new(World)
     world.Scene = scene
     world.window = window
     world.program = program
-    //&renderer.Start(world)
 
     return renderer, world
 }
@@ -91,4 +80,9 @@ func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error)
 
 func (w World) Program() uint32 {
     return w.program
+}
+
+func (w World) NewObject(geometry *Geometry) *Object {
+	object := NewObject(geometry)
+    return object
 }

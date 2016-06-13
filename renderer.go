@@ -4,12 +4,24 @@ import (
     "github.com/go-gl/gl/v4.1-core/gl"
     "github.com/go-gl/mathgl/mgl32"
 	"github.com/go-gl/glfw/v3.1/glfw"
+    "fmt"
 )
 
 type Renderer struct {
     camera *Camera
 }
 
+func NewRenderer(camera *Camera) *Renderer{
+    renderer := new(Renderer)
+    renderer.camera = camera
+
+    //TODO: Make this configurable
+    gl.Enable(gl.DEPTH_TEST)
+    gl.DepthFunc(gl.LESS)
+	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
+
+    return renderer
+}
 func (r *Renderer) Render(world *World) {
 
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -28,7 +40,7 @@ func (r *Renderer) render(scene *Scene) {
 }
 
 func (r *Renderer) renderObject(object *Object) {
-
+    fmt.Println("Render Object")
     // TODO: Make naming and logic consistent
     mat := mgl32.Ident4()
     rot := mgl32.Ident4()
@@ -40,7 +52,6 @@ func (r *Renderer) renderObject(object *Object) {
     scale := mgl32.Scale3D(
         object.scale[0],
         object.scale[1],
-        //object.scale[2], // TODO
         0.0,
     )
 
@@ -49,11 +60,10 @@ func (r *Renderer) renderObject(object *Object) {
 
     // Render calls
     gl.UniformMatrix4fv(object.modelUniform, 1, false, &mat[0])
-    gl.BindVertexArray(object.vao)
-    gl.DrawArrays( 
-        object.geometry.draw_method, 
+    gl.BindVertexArray(object.geometry.vao)
+    gl.DrawArrays(
+        object.geometry.draw_method,
         0,
         int32(len(object.geometry.vertices)),
     )
-
 }

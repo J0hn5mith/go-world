@@ -70,8 +70,9 @@ func (p *Particle) createObject() {
 	if p.object != nil {
 		p.scene.RemoveObject(p.object)
 	}
-	p.object = NewObject(createCircleGeometry(60, p.radius))
-	p.object.configure(p.scene.program)
+	p.object = NewObject(
+        createCircleGeometry(60, p.radius).Load(p.scene.program),
+    )
 	p.scene.addObject(p.object)
 }
 

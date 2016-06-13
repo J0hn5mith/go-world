@@ -1,7 +1,6 @@
 package go_world
 
 import (
-	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -45,28 +44,4 @@ func (o *Object) SetPosition(x, y, z float32) *Object {
 
 func (o Object) Position() mgl32.Vec3 {
 	return o.position
-}
-
-func (object *Object) Configure(program uint32) {
-	object.configure(program)
-}
-func (object *Object) configure(program uint32) {
-
-	gl.GenVertexArrays(1, &object.vao)
-	gl.BindVertexArray(object.vao)
-
-	var vbo uint32
-	gl.GenBuffers(1, &vbo)
-	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
-	gl.BufferData(gl.ARRAY_BUFFER, len(object.geometry.vertices)*5, gl.Ptr(object.geometry.vertices), gl.STATIC_DRAW)
-	object.vbo = vbo
-
-	vertAttrib := uint32(gl.GetAttribLocation(program, gl.Str("position\x00")))
-	gl.EnableVertexAttribArray(vertAttrib)
-	gl.VertexAttribPointer(vertAttrib, 3, gl.FLOAT, false, 0, gl.PtrOffset(0))
-
-	// Configure global settings
-    gl.Enable(gl.DEPTH_TEST)
-    gl.DepthFunc(gl.LESS)
-	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
 }
