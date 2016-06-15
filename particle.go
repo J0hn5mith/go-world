@@ -36,7 +36,6 @@ func (p *Particle) ApplyForce(x, y, z float32) {
 	p.velocity[0] = p.velocity[0] + x
 	p.velocity[1] = p.velocity[1] + y
 	p.velocity[2] = p.velocity[2] + z
-
 }
 
 func (p Particle) Object() *Object {

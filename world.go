@@ -40,6 +40,7 @@ func StartWorld(window *glfw.Window) (*Renderer, *World) {
     world.Scene = scene
     world.window = window
     world.program = program
+    world.camera = camera
 
     return renderer, world
 }
@@ -80,6 +81,10 @@ func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error)
 
 func (w World) Program() uint32 {
     return w.program
+}
+
+func (w World) Camera() *Camera {
+    return w.camera
 }
 
 func (w World) NewObject(geometry *Geometry) *Object {

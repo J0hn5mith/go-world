@@ -30,21 +30,22 @@ func compileShader(source string, shaderType uint32) (uint32, error) {
 
 var vertexShader = `
 #version 330
-in vec2 position;
+in vec3 position;
 uniform mat4 model;
 uniform mat4 camera;
 uniform mat4 projection;
 
 void main() {
-	gl_Position = projection * camera  * model * vec4(position, 0.0, 1);
+	gl_Position = projection * camera  * model * vec4(position, 1);
 }
 ` + "\x00"
 
 var fragmentShader = `
 #version 330
+uniform vec3 modelColor;
 
 out vec4 outputColor;
 void main() {
-	outputColor = vec4(0,0,0,0);
+	outputColor = vec4(modelColor, 0);
 }
 ` + "\x00"

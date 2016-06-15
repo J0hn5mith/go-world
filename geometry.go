@@ -9,21 +9,29 @@ import (
 type Geometry struct {
     vertices    []float32
     draw_method uint32
+    color         mgl32.Vec3
 
-    vao          uint32
-    vbo          uint32
+    vao uint32
+    vbo uint32
 }
 
 func NewGeometry(vertices []float32) *Geometry {
     geometry := new(Geometry)
     geometry.vertices = vertices
+    geometry.color = mgl32.Vec3{0,0,0}
     return geometry
 }
+
+func (geometry * Geometry) SetColorRGB(r, g, b float32) *Geometry {
+    geometry.color = mgl32.Vec3{r, g, b}
+    return geometry
+}
+
 
 /*
 Loads the geometry data to the GPU memory
 */
-func (geometry *Geometry) Load(program uint32) *Geometry{
+func (geometry *Geometry) Load(program uint32) *Geometry {
     gl.GenVertexArrays(1, &geometry.vao)
     gl.BindVertexArray(geometry.vao)
 
@@ -36,7 +44,7 @@ func (geometry *Geometry) Load(program uint32) *Geometry{
         gl.STATIC_DRAW,
     )
 
-    //TODO What is this about? 
+    //TODO What is this about?
     vertAttrib := uint32(gl.GetAttribLocation(program, gl.Str("position\x00")))
     gl.EnableVertexAttribArray(vertAttrib)
     gl.VertexAttribPointer(vertAttrib, 3, gl.FLOAT, false, 0, gl.PtrOffset(0))
@@ -188,6 +196,20 @@ func CreateCircleGeometry(num_vertices int, radius float32) *Geometry {
     return createCircleGeometry(num_vertices, radius)
 }
 
+func CreatePlaneGeometry(sideLength float32) *Geometry {
+    halfSideLength := sideLength/ 2.0
+    //halfSideLength :=  float32(1.0)
+    geometry := NewGeometry([]float32{
+        -halfSideLength, 0, halfSideLength,
+        halfSideLength, 0, halfSideLength,
+        -halfSideLength, 0, -halfSideLength,
+        halfSideLength, 0, -halfSideLength,
+    })
+    geometry.draw_method = gl.TRIANGLE_STRIP
+
+    return geometry
+}
+
 func createCircleGeometry(num_vertices int, radius float32) *Geometry {
     vertices := []float32{}
 
@@ -214,7 +236,7 @@ func createCircleGeometry(num_vertices int, radius float32) *Geometry {
         float32(px)*radius, float32(py)*radius, 0.0,
     )
 
-    geometry := NewGeometry(vertices);
+    geometry := NewGeometry(vertices)
     geometry.draw_method = gl.TRIANGLES
     return geometry
 }
