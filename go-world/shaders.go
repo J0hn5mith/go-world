@@ -36,7 +36,7 @@ uniform mat4 camera;
 uniform mat4 projection;
 
 void main() {
-	gl_Position = projection * camera  * model * vec4(position, 1);
+    gl_Position = projection * camera  * model * vec4(position, 1);
 }
 ` + "\x00"
 

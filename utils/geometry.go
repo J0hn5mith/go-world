@@ -1,60 +1,15 @@
-package go_world
+package go_world_utils
 
-import (
-    "github.com/go-gl/gl/v4.1-core/gl"
-    "github.com/go-gl/mathgl/mgl32"
+
+import(
+    "go-world/go-world"
     "math"
+	"github.com/go-gl/mathgl/mgl32"
+    "github.com/go-gl/gl/v4.1-core/gl"
 )
 
-type Geometry struct {
-    vertices    []float32
-    draw_method uint32
-    color         mgl32.Vec3
 
-    vao uint32
-    vbo uint32
-}
-
-func NewGeometry(vertices []float32) *Geometry {
-    geometry := new(Geometry)
-    geometry.vertices = vertices
-    geometry.color = mgl32.Vec3{0,0,0}
-    return geometry
-}
-
-func (geometry * Geometry) SetColorRGB(r, g, b float32) *Geometry {
-    geometry.color = mgl32.Vec3{r, g, b}
-    return geometry
-}
-
-
-/*
-Loads the geometry data to the GPU memory
-*/
-func (geometry *Geometry) Load(program uint32) *Geometry {
-    gl.GenVertexArrays(1, &geometry.vao)
-    gl.BindVertexArray(geometry.vao)
-
-    gl.GenBuffers(1, &geometry.vbo)
-    gl.BindBuffer(gl.ARRAY_BUFFER, geometry.vbo)
-    gl.BufferData(
-        gl.ARRAY_BUFFER,
-        len(geometry.vertices)*5,
-        gl.Ptr(geometry.vertices),
-        gl.STATIC_DRAW,
-    )
-
-    //TODO What is this about?
-    vertAttrib := uint32(gl.GetAttribLocation(program, gl.Str("position\x00")))
-    gl.EnableVertexAttribArray(vertAttrib)
-    gl.VertexAttribPointer(vertAttrib, 3, gl.FLOAT, false, 0, gl.PtrOffset(0))
-    return geometry
-}
-
-/*
-Utils
-*/
-func createSphereGeometry(radius float32, rings, sectors float64) *Geometry {
+func createSphereGeometry(radius float32, rings, sectors float64) *go_world.Geometry {
     var R float64 = float64(1.0 / (rings - 1))
     var S float64 = float64(1.0 / (sectors - 1))
 
@@ -80,11 +35,11 @@ func createSphereGeometry(radius float32, rings, sectors float64) *Geometry {
         }
     }
 
-    geometry := NewGeometry(vertices)
+    geometry := go_world.NewGeometry(vertices)
     return geometry
 }
 
-func createDiamondGeometry(side_length float32) *Geometry {
+func createDiamondGeometry(side_length float32) *go_world.Geometry {
     var vertices = []float32{
         0.5, 0.0, 0.0,
         0.0, 0.5, 0.0,
@@ -98,11 +53,11 @@ func createDiamondGeometry(side_length float32) *Geometry {
         0.0, -0.5, 0.0,
         0.5, 0.0, 0.0,
     }
-    geometry := NewGeometry(vertices)
+    geometry := go_world.NewGeometry(vertices)
     return geometry
 }
 
-func createTriangle2DGeometry(side_length float32) *Geometry {
+func createTriangle2DGeometry(side_length float32) *go_world.Geometry {
     side_length = side_length
     var vertices = []float32{
         -side_length / 2.0, -side_length / 2, 0.0,
@@ -110,34 +65,34 @@ func createTriangle2DGeometry(side_length float32) *Geometry {
         0, side_length / 2.0, 0.0,
         0, side_length / 2.0, 0.0,
     }
-    geometry := NewGeometry(vertices)
+    geometry := go_world.NewGeometry(vertices)
     return geometry
 }
 
-func CreateLineGeometry(start, end mgl32.Vec3) *Geometry {
+func CreateLineGeometry(start, end mgl32.Vec3) *go_world.Geometry {
     var vertices = []float32{
         start.X(), start.Y(), start.Z(),
         end.X(), end.Y(), end.Z(),
     }
 
-    geometry := NewGeometry(vertices)
-    geometry.draw_method = gl.LINES
+    geometry := go_world.NewGeometry(vertices)
+    geometry.SetDrawMethod(gl.LINES)
     return geometry
 }
 
-func CreateLineLoopGeometry(points ...mgl32.Vec3) *Geometry {
+func CreateLineLoopGeometry(points ...mgl32.Vec3) *go_world.Geometry {
     vertices := []float32{}
     for i, point := range points {
         pn := points[(i+1)%len(points)]
         vertices = append(vertices, point.X(), point.Y(), point.Z(), pn.X(), pn.Y(), pn.Z())
     }
-    geometry := NewGeometry(vertices)
-    geometry.draw_method = gl.LINES
+    geometry := go_world.NewGeometry(vertices)
+    geometry.SetDrawMethod( gl.LINES)
 
     return geometry
 }
 
-func createCubeGeometry(side_length float32) *Geometry {
+func createCubeGeometry(side_length float32) *go_world.Geometry {
     side_length = side_length
     var vertices = []float32{
         // Bottom
@@ -188,29 +143,28 @@ func createCubeGeometry(side_length float32) *Geometry {
         side_length, side_length, -side_length,
         side_length, side_length, side_length,
     }
-    geometry := NewGeometry(vertices)
+    geometry := go_world.NewGeometry(vertices)
     return geometry
 }
 
-func CreateCircleGeometry(num_vertices int, radius float32) *Geometry {
+func CreateCircleGeometry(num_vertices int, radius float32) *go_world.Geometry {
     return createCircleGeometry(num_vertices, radius)
 }
 
-func CreatePlaneGeometry(sideLength float32) *Geometry {
+func CreatePlaneGeometry(sideLength float32) *go_world.Geometry {
     halfSideLength := sideLength/ 2.0
-    //halfSideLength :=  float32(1.0)
-    geometry := NewGeometry([]float32{
+    geometry := go_world.NewGeometry([]float32{
         -halfSideLength, 0, halfSideLength,
         halfSideLength, 0, halfSideLength,
         -halfSideLength, 0, -halfSideLength,
         halfSideLength, 0, -halfSideLength,
     })
-    geometry.draw_method = gl.TRIANGLE_STRIP
+    geometry.SetDrawMethod(gl.TRIANGLE_STRIP)
 
     return geometry
 }
 
-func createCircleGeometry(num_vertices int, radius float32) *Geometry {
+func createCircleGeometry(num_vertices int, radius float32) *go_world.Geometry {
     vertices := []float32{}
 
     px, py := angleToCoords(0)
@@ -236,8 +190,8 @@ func createCircleGeometry(num_vertices int, radius float32) *Geometry {
         float32(px)*radius, float32(py)*radius, 0.0,
     )
 
-    geometry := NewGeometry(vertices)
-    geometry.draw_method = gl.TRIANGLES
+    geometry := go_world.NewGeometry(vertices)
+    geometry.SetDrawMethod(gl.TRIANGLES)
     return geometry
 }
 
@@ -246,7 +200,7 @@ func angleToCoords(angle float64) (float64, float64) {
     y := math.Cos(angle)
     return x, y
 }
-func createOctahedronGeometry() *Geometry {
+func createOctahedronGeometry() *go_world.Geometry {
     p0 := mgl32.Vec3{0, 1, 0}
     p1 := mgl32.Vec3{-1, 0, 1}
     p2 := mgl32.Vec3{1, 0, 1}
@@ -263,7 +217,7 @@ func createOctahedronGeometry() *Geometry {
     t7 := Triangle{p5, p3, p4}
     t8 := Triangle{p5, p4, p1}
 
-    geometry := NewGeometry(t_to_array(t1, t2, t3, t4, t5, t6, t7, t8))
+    geometry := go_world.NewGeometry(t_to_array(t1, t2, t3, t4, t5, t6, t7, t8))
     return geometry
 }
 

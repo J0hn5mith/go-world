@@ -14,16 +14,17 @@ func NewRenderer(camera *Camera) *Renderer {
 	renderer := new(Renderer)
 	renderer.camera = camera
 
-	//TODO: Make this configurable
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
 
 	return renderer
 }
-func (r *Renderer) Render(world *World) {
 
-	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+func (r *Renderer) Render(world *World) {
+    gl.ClearDepth(1.0)
+    gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
 	r.render(world.Scene)
 
 	world.window.SwapBuffers()
@@ -33,7 +34,10 @@ func (r *Renderer) Render(world *World) {
 func (r *Renderer) render(scene *Scene) {
 	gl.UseProgram(r.camera.program)
 	for _, object := range scene.objects {
-		uniColor := gl.GetUniformLocation(r.camera.program, gl.Str("modelColor\x00"))
+		uniColor := gl.GetUniformLocation(
+            r.camera.program, 
+            gl.Str("modelColor\x00"),
+        )
 		gl.Uniform3f(uniColor,
 			object.geometry.color[0],
 			object.geometry.color[1],
@@ -44,24 +48,24 @@ func (r *Renderer) render(scene *Scene) {
 }
 
 func (r *Renderer) renderObject(object *Object) {
-	// TODO: Make naming and logic consistent
 	mat := mgl32.Ident4()
 	trans := mgl32.Translate3D(
-		object.position[0],
-		object.position[1],
-		object.position[2],
+        object.position[0],
+        object.position[1],
+        object.position[2],
 	)
 	scale := mgl32.Scale3D(
 		object.scale[0],
 		object.scale[1],
 		object.scale[2],
-		//0.0,
 	)
-
 	mat = mat.Mul4(scale).Mul4(trans).Mul4(object.rotation)
+    modelUniform := gl.GetUniformLocation(
+        r.camera.program,
+        gl.Str("model\x00"),
+    )
+    gl.UniformMatrix4fv(modelUniform, 1, false, &mat[0])
 
-	// Render calls
-	gl.UniformMatrix4fv(object.modelUniform, 1, false, &mat[0])
 	gl.BindVertexArray(object.geometry.vao)
 	gl.DrawArrays(
 		object.geometry.draw_method,
