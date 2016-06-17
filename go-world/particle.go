@@ -77,7 +77,7 @@ func (p *Particle) createObject() {
 
 type ParticleSystem struct {
 	particles          []*Particle
-	forceFields        []ForceField
+	forceFields        []ParticleForceField
 	constraints        []Constraint
 	collisionHandler   CollisionHandler
 	gravitationHandler GravitationHandler
@@ -114,7 +114,7 @@ func (ps *ParticleSystem) Particles() []*Particle {
 	return ps.particles
 }
 
-func (ps *ParticleSystem) AddForceField(ff ForceField) {
+func (ps *ParticleSystem) AddForceField(ff ParticleForceField) {
 	ps.forceFields = append(ps.forceFields, ff)
 }
 
@@ -175,7 +175,7 @@ func (particleSystem *ParticleSystem) animate(time_delta float32) {
 	}
 }
 
-type ForceField interface {
+type ParticleForceField interface {
 	Apply(p *Particle, time_detla float32)
 }
 

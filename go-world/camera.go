@@ -33,7 +33,7 @@ func (camera *Camera) updateViewMatrix() {
 		mgl32.DegToRad(45.0),
 		camera.ratio,
 		0.1,
-		10.0,
+		30.0,
 	)
 	projectionUniform := gl.GetUniformLocation(
 		camera.program,
