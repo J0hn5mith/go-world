@@ -53,7 +53,7 @@ func (p *Particle) SetRadius(radius float32) *Particle {
 }
 
 func (p *Particle) Position() mgl32.Vec3 {
-	return p.object.position
+	return p.object.Position()
 }
 
 func (p *Particle) SetPosition(x, y, z float32) *Particle{
