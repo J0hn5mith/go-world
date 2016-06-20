@@ -11,6 +11,7 @@ import (
 type World struct {
 	Scene   *Scene
 	camera  *Camera
+	physics *Physics
 	window  *glfw.Window
 	program uint32
 }
@@ -31,18 +32,18 @@ func StartWorld(window *glfw.Window) (*Renderer, *World) {
 	modelUniform := gl.GetUniformLocation(program, gl.Str("model\x00"))
 	gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
 
-    width, height := window.GetSize()
+	width, height := window.GetSize()
 	camera := NewCamera(program, width, height)
 	scene := NewScene(program)
 	renderer := NewRenderer(camera)
 
-    world := new(World)
-    world.Scene = scene
-    world.window = window
-    world.program = program
-    world.camera = camera
+	world := new(World)
+	world.Scene = scene
+	world.window = window
+	world.program = program
+	world.camera = camera
 
-    return renderer, world
+	return renderer, world
 }
 
 func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error) {
@@ -80,14 +81,30 @@ func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error)
 }
 
 func (w World) Program() uint32 {
-    return w.program
+	return w.program
 }
 
 func (w World) Camera() *Camera {
-    return w.camera
+	return w.camera
+}
+
+func (world *World) Physics() *Physics {
+	return world.physics
+}
+
+func (world *World) SetPhysics(physics *Physics) *World {
+	world.physics = physics
+    return world
 }
 
 func (w World) NewObject(geometry *Geometry) *Object {
 	object := NewObject(geometry)
-    return object
+	return object
+}
+
+func (world *World) Update(timeDelta float32) *World {
+	if world.physics != nil {
+		world.physics.Update(timeDelta)
+	}
+    return world
 }

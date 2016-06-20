@@ -17,3 +17,16 @@ func TestCicrcleCollision(p1, p2 mgl32.Vec3, r1, r2 float32) Collision {
 	}
 	return Collision{mgl32.Vec3{0, 0, 0}, 0}
 }
+
+func VectorToFloats(vector mgl32.Vec3) (x, y, z float32) {
+		return vector[0], vector[1], vector[2]
+}
+
+func VectorsToFloats(vertices ...mgl32.Vec3) []float32 {
+	var array []float32
+	for _, v := range vertices {
+		x, y, z := VectorToFloats(v)
+		array = append(array, x, y, z)
+	}
+	return array
+}

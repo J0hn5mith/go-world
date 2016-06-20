@@ -32,15 +32,8 @@ Loads the geometry data to the GPU memory
 func (geometry *Geometry) Load(program uint32) *Geometry {
 	gl.GenVertexArrays(1, &geometry.vao)
 	gl.BindVertexArray(geometry.vao)
-
 	gl.GenBuffers(1, &geometry.vbo)
-	gl.BindBuffer(gl.ARRAY_BUFFER, geometry.vbo)
-	gl.BufferData(
-		gl.ARRAY_BUFFER,
-		len(geometry.vertices)*5,
-		gl.Ptr(geometry.vertices),
-		gl.STATIC_DRAW,
-	)
+	geometry.UpdateVertices(geometry.vertices)
 
 	vertAttrib := uint32(gl.GetAttribLocation(program, gl.Str("position\x00")))
 	gl.EnableVertexAttribArray(vertAttrib)
@@ -48,7 +41,27 @@ func (geometry *Geometry) Load(program uint32) *Geometry {
 	return geometry
 }
 
+func (geometry *Geometry) DrawMethod() uint32 {
+    return geometry.draw_method
+}
 func (geometry *Geometry) SetDrawMethod(method uint32) *Geometry {
-    geometry.draw_method = method
-    return geometry
+	geometry.draw_method = method
+	return geometry
+}
+
+func (geometry *Geometry) Vertices() []float32 {
+    return geometry.vertices
+}
+
+func (geometry *Geometry) UpdateVertices(vertices []float32) *Geometry {
+	geometry.vertices = vertices
+	gl.BindVertexArray(geometry.vao)
+	gl.BindBuffer(gl.ARRAY_BUFFER, geometry.vbo)
+	gl.BufferData(
+		gl.ARRAY_BUFFER,
+		len(geometry.vertices)*4,
+		gl.Ptr(geometry.vertices),
+		gl.DYNAMIC_DRAW,
+	)
+	return geometry
 }

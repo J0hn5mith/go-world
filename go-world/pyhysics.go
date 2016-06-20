@@ -1,6 +1,7 @@
 package go_world
 
 import (
+	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -9,7 +10,7 @@ Extends a plain object with a physical representation
 */
 type PhysicalBody interface {
 	SetVelocity(x, y, z float32) PhysicalBody
-    GetVelocity() mgl32.Vec3 //TODO: Deprecated
+	GetVelocity() mgl32.Vec3 //TODO: Deprecated
 	Velocity() mgl32.Vec3
 
 	SetPosition(x, y, z float32) PhysicalBody
@@ -26,8 +27,8 @@ type PhysicalBody interface {
 
 	Object() *Object
 
-    Mass() float32
-    SetMass(mass float32) PhysicalBody
+	Mass() float32
+	SetMass(mass float32) PhysicalBody
 }
 
 type RigidBody struct {
@@ -36,7 +37,7 @@ type RigidBody struct {
 	angularVelocity mgl32.Vec3
 	centerOfMass    mgl32.Vec3
 	massParticles   []*MassParticle
-    mass float32
+	mass            float32
 }
 
 func NewRigidBody() *RigidBody {
@@ -49,7 +50,7 @@ func CreateRigidBody(object *Object) *RigidBody {
 	rigidBody := new(RigidBody)
 	rigidBody.object = object
 	rigidBody.velocity = mgl32.Vec3{0, 0, 0}
-    rigidBody.mass = 1.0
+	rigidBody.mass = 1.0
 
 	return rigidBody
 }
@@ -85,14 +86,14 @@ func (rigidBody *RigidBody) GetMassParticles() []*MassParticle {
 	return rigidBody.massParticles
 }
 
-func (rigidBody *RigidBody) ApplyForce(x, y, z float32) PhysicalBody{
-    v := rigidBody.GetVelocity()
-    rigidBody.SetVelocity(
-        v.X() + x,
-        v.Y() + y,
-        v.Z() + z,
-    )
-    return rigidBody
+func (rigidBody *RigidBody) ApplyForce(x, y, z float32) PhysicalBody {
+	v := rigidBody.GetVelocity()
+	rigidBody.SetVelocity(
+		v.X()+x,
+		v.Y()+y,
+		v.Z()+z,
+	)
+	return rigidBody
 }
 
 func (rigidBody *RigidBody) Object() *Object {
@@ -100,11 +101,11 @@ func (rigidBody *RigidBody) Object() *Object {
 }
 
 func (rigidBody *RigidBody) Mass() float32 {
-    return rigidBody.mass
+	return rigidBody.mass
 }
 func (rigidBody *RigidBody) SetMass(mass float32) PhysicalBody {
-    rigidBody.mass = mass
-    return rigidBody
+	rigidBody.mass = mass
+	return rigidBody
 }
 
 func (rigidBody *RigidBody) SetPosition(x, y, z float32) PhysicalBody {
@@ -129,6 +130,7 @@ func (rigidBody *RigidBody) ShiftPosition(x, y, z float32) PhysicalBody {
 type Physics struct {
 	dynamicBodies    []*RigidBody
 	staticBodies     []*RigidBody
+	softBodies       []*SoftBody
 	forceFields      []ForceField
 	collisionHandler PhysicsCollisionHandler
 }
@@ -144,6 +146,11 @@ func (physics *Physics) RegisterDynamicObject(object *Object) *RigidBody {
 	return rigidBody
 }
 
+func (physics *Physics) RegisterSoftBody(body *SoftBody) PhysicalBody {
+	physics.softBodies = append(physics.softBodies, body)
+	return body
+}
+
 func (physics *Physics) RegisterStaticObject(object *Object) *RigidBody {
 	rigidBody := CreateRigidBody(object)
 	physics.staticBodies = append(physics.staticBodies, rigidBody)
@@ -151,14 +158,17 @@ func (physics *Physics) RegisterStaticObject(object *Object) *RigidBody {
 }
 
 func (physics *Physics) Update(timeDelta float32) {
-	physics.animate(timeDelta)
+    physics.applySpringForces(timeDelta)
 	physics.applyForceFields(timeDelta)
+	physics.animate(timeDelta)
 	if physics.collisionHandler != nil {
 		physics.collisionHandler.Apply(
 			physics.dynamicBodies,
 			physics.staticBodies,
+			physics.softBodies,
 		)
 	}
+	physics.enforceConstraints()
 }
 
 func (physics *Physics) AddForceField(forceField ForceField) {
@@ -178,6 +188,23 @@ func (physics *Physics) animate(time_delta float32) {
 		rigidBody.object.RotateY(rigidBody.angularVelocity[1])
 		rigidBody.object.RotateZ(rigidBody.angularVelocity[2])
 	}
+
+	for _, softBody := range physics.softBodies {
+		for _, particle := range softBody.GetMassParticles() {
+			newPosition := particle.Velocity().Mul(time_delta).Add(particle.Position())
+			particle.SetPosition(
+				newPosition.X(),
+				newPosition.Y(),
+				newPosition.Z(),
+			)
+			//rotation := softBody.AngularVelocity().Mul(time_delta)
+			//softBody.object.RotateX(rotation.X())
+			//softBody.object.RotateY(rotation.Y())
+			//softBody.object.RotateZ(rotation.Z())
+		}
+		softBody.Object().Geometry().SetDrawMethod(gl.TRIANGLE_STRIP)
+		softBody.Object().Geometry().UpdateVertices(softBody.GetVertices())
+	}
 }
 
 func (physics *Physics) applyForceFields(timeDelta float32) {
@@ -185,18 +212,42 @@ func (physics *Physics) applyForceFields(timeDelta float32) {
 		for _, rigidBody := range physics.dynamicBodies {
 			forceField.Apply(rigidBody, timeDelta)
 		}
+		for _, softBody := range physics.softBodies {
+			forceField.ApplySoft(softBody, timeDelta)
+		}
 	}
 }
 
+func (physics *Physics) applySpringForces(timeDelta float32) {
+	for _, softBody := range physics.softBodies {
+		softBody.UpdateSpringForces()
+	}
+	for _, softBody := range physics.softBodies {
+		softBody.ApplySpringForces(timeDelta)
+	}
+}
+
+func (physics *Physics) enforceConstraints() {
+	//for _, softBody := range physics.softBodies {
+	//softBody.UpdateSpringForces()
+	//}
+}
+
 type MassParticle struct {
-	position mgl32.Vec3 // Position relative to the center of mass
-	radius   float32
+	position    mgl32.Vec3 // Position relative to the center of mass
+	velocity    mgl32.Vec3
+	radius      float32
+	collided    bool
+	springs     []*Spring
+	springForce mgl32.Vec3
 }
 
 func CreateMassParticle(x, y, z, radius float32) *MassParticle {
 	massParticle := new(MassParticle)
 	massParticle.position = mgl32.Vec3{x, y, z}
+	massParticle.velocity = mgl32.Vec3{0, 0, 0}
 	massParticle.radius = radius
+	massParticle.collided = false
 
 	return massParticle
 }
@@ -205,16 +256,115 @@ func (massParticle *MassParticle) Position() mgl32.Vec3 {
 	return massParticle.position
 }
 
+func (massParticle *MassParticle) SetPosition(x, y, z float32) *MassParticle {
+	massParticle.position = mgl32.Vec3{x, y, z}
+	return massParticle
+}
+
+func (massParticle *MassParticle) ShiftPosition(x, y, z float32) *MassParticle {
+	p := massParticle.Position()
+	massParticle.SetPosition(
+		p[0]+x,
+		p[1]+y,
+		p[2]+z,
+	)
+	return massParticle
+}
+
 func (massParticle *MassParticle) Radius() float32 {
 	return massParticle.radius
 }
 
+func (massParticle *MassParticle) Velocity() mgl32.Vec3 {
+	return massParticle.velocity
+}
+
+func (massParticle *MassParticle) Collided() bool {
+	return massParticle.collided
+}
+
+func (massParticle *MassParticle) SetCollided(collided bool) *MassParticle {
+	massParticle.collided = collided
+	return massParticle
+}
+
+func (massParticle *MassParticle) SetVelocity(x, y, z float32) *MassParticle {
+	massParticle.velocity = mgl32.Vec3{x, y, z}
+	return massParticle
+}
+
+func (massParticle *MassParticle) AddSpring(spring *Spring) *MassParticle {
+	massParticle.springs = append(massParticle.springs, spring)
+	return massParticle
+}
+
+func (massParticle *MassParticle) Springs() []*Spring {
+	return massParticle.springs
+}
+
+func (massParticle *MassParticle) GetSpringForce() mgl32.Vec3 {
+	return massParticle.springForce
+}
+
+func (massParticle *MassParticle) SetSpringForce(x, y, z float32) *MassParticle {
+	massParticle.springForce = mgl32.Vec3{x, y, z}
+	return massParticle
+}
+
+func (massParticle *MassParticle) ApplySpringForce(force mgl32.Vec3) *MassParticle {
+	massParticle.springForce = massParticle.springForce.Add(force)
+	return massParticle
+}
+
+func (massParticle *MassParticle) ApplyForce(x, y, z float32) *MassParticle {
+	v := massParticle.Velocity()
+	massParticle.SetVelocity(
+		v.X()+x,
+		v.Y()+y,
+		v.Z()+z,
+	)
+	return massParticle
+}
+
+type Spring struct {
+	source         *MassParticle
+	target         *MassParticle
+	length         float32
+	springConstant float32
+	damperConstant float32
+}
+
+func SpringFromMassParticles(particle1, particle2 *MassParticle, springConstant, damperConstant float32) *Spring {
+	spring := new(Spring)
+	spring.source = particle1
+	spring.target = particle2
+	spring.length = particle1.Position().Sub(particle2.Position()).Len()
+	spring.springConstant = springConstant
+	spring.damperConstant = damperConstant
+	return spring
+}
+
+func (spring *Spring) Apply() {
+	offset := spring.target.Position().Sub(spring.source.Position())
+	direction := offset.Normalize()
+    damperForce := direction.Mul(
+        spring.target.Velocity().Dot(direction) - spring.source.Velocity().Dot(direction),
+    ).Mul(spring.damperConstant)
+	springForce := direction.Mul(offset.Len() - spring.length).Mul(spring.springConstant)
+
+    totalForce := damperForce.Add(springForce)
+    spring.source.ApplySpringForce(totalForce)
+    spring.target.ApplySpringForce(totalForce.Mul(-1))
+
+}
+
 type ForceField interface {
 	Apply(p PhysicalBody, timeDetla float32)
+	ApplySoft(softBody *SoftBody, timeDetla float32)
 }
 
 type PhysicsCollisionHandler interface {
-	Apply(dynamicBodies, staticBodies []*RigidBody)
+	Apply(dynamicBodies, staticBodies []*RigidBody, softBodies []*SoftBody)
 }
 
 /*

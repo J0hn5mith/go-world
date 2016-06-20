@@ -29,6 +29,10 @@ func NewObject(geometry *Geometry) *Object {
 	return object
 }
 
+func (object Object) Geometry() *Geometry {
+	return object.geometry
+}
+
 func (o *Object) SetPosition(x, y, z float32) *Object {
 	o.position = mgl32.Vec3{x, y, z}
     o.dirty = true
