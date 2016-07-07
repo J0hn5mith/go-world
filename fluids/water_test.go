@@ -1,4 +1,4 @@
-package go_world_utils
+package go_world_fluids
 
 import (
 	"go-world/go-world"

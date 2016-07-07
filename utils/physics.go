@@ -7,6 +7,11 @@ import (
 
 var G float32 = 9.81
 
+
+/*
+Default implementations for the physics stuff
+*/
+
 type GravityForceField struct{}
 
 func (forceField *GravityForceField) Apply(body go_world.PhysicalBody, timeDelta float32) {
