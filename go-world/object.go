@@ -10,20 +10,16 @@ type Object struct {
 	rotation             mgl32.Mat4
 	scale                mgl32.Vec3
 	transformationBuffer mgl32.Mat4
-	model                mgl32.Mat4
-	modelUniform         int32
-	vao                  uint32
-	vbo                  uint32
 	dirty                bool
 }
 
 func NewObject(geometry *Geometry) *Object {
 	object := new(Object)
 	object.geometry = geometry
-
 	object.position = mgl32.Vec3{0, 0, 0}
 	object.rotation = mgl32.Ident4()
 	object.scale = mgl32.Vec3{1, 1, 1}
+	object.transformationBuffer = mgl32.Ident4()
 	object.dirty = true
 
 	return object
@@ -66,7 +62,7 @@ func (object *Object) Rotation() mgl32.Mat4 {
 }
 
 func (object *Object) SetScale(scale float32) {
-	object.setScale(scale)
+	object.scale = mgl32.Vec3{scale, scale, scale}
     object.dirty = true
 }
 
@@ -89,8 +85,4 @@ func (object *Object) TransformationMatrix() mgl32.Mat4 {
         object.dirty = false
 	}
 	return object.transformationBuffer
-}
-
-func (object *Object) setScale(scale float32) {
-	object.scale = mgl32.Vec3{scale, scale, scale}
 }

@@ -84,10 +84,12 @@ func (softBody *SoftBody) Object() *Object {
 func (softBody *SoftBody) Mass() float32 {
 	return softBody.mass
 }
+
 func (softBody *SoftBody) SetMass(mass float32) PhysicalBody {
 	softBody.mass = mass
 	return softBody
 }
+
 func (softBody *SoftBody) Springs() []*Spring {
 	return softBody.springs
 }
@@ -122,12 +124,14 @@ func (softBody *SoftBody) GetVertices() []float32 {
 				array = append(array, x, y, z)
 				x, y, z = VectorToFloats(particle.Position())
 				array = append(array, x, y, z)
+				if x == 0 && y == 0 {
+					fmt.Println(x, y, z)
+				}
 			}
 		}
 		lastRow = row
 	}
 	return array
-	//return []float32{-0.5, -0.5, 0, 0.5, -0.5, 0, -0.5, 0.5, 0, 0.5, 0.5, 0}
 }
 
 func (softBody *SoftBody) UpdateSpringForces() *SoftBody {
@@ -151,6 +155,7 @@ func (softBody *SoftBody) ApplySpringForces(timeDelta float32) *SoftBody {
 	}
 	return softBody
 }
+
 func AddMassParticleSoft2D(softBody *SoftBody, x, y, diameter float32) {
 	radius := diameter / 2
 	lenX := int(x / diameter)
@@ -178,8 +183,8 @@ func AddMassParticleSoft2D(softBody *SoftBody, x, y, diameter float32) {
 				springs = append(springs, AddSpring(particle, row[x+1]))
 			}
 			if y+1 < lenY {
-                targetRow := particles[y+1]
-                springs = append(springs, AddSpring(particle, targetRow[x]))
+				targetRow := particles[y+1]
+				springs = append(springs, AddSpring(particle, targetRow[x]))
 				if x+1 < lenX {
 					springs = append(springs, AddSpring(particle, targetRow[x+1]))
 				}

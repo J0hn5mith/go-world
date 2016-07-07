@@ -25,6 +25,12 @@ func (scene *Scene) AddObject(object *Object) {
 	scene.objects = append(scene.objects, object)
 }
 
+func (scene *Scene) AddObjects(objects ...*Object) {
+	for _, object := range objects {
+        scene.AddObject(object)
+    }
+}
+
 func (s *Scene) RemoveObject(object *Object) *Scene {
 	for i, item := range s.objects {
 		if item == object {

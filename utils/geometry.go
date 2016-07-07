@@ -7,8 +7,18 @@ import (
 	"math"
 )
 
-func CreateBoxGeometry(x, y, z float32) *go_world.Geometry{
+/*
+Geometry Creators
+*/
+func CreateBoxGeometry(x, y, z float32) *go_world.Geometry {
 	return createBoxGeometry(x, y, z)
+}
+
+func CreateWireBoxGeometry(width, height, depth float32) *go_world.Geometry {
+    vertices := CreateWireBoxVertices(width, height, depth)
+	geometry := go_world.NewGeometry(vertices)
+	geometry.SetDrawMethod(gl.LINES)
+	return geometry
 }
 
 func CreateCubeGeometry(sideLength float32) *go_world.Geometry {
@@ -120,59 +130,7 @@ func createCubeGeometry(sideLength float32) *go_world.Geometry {
 }
 
 func createBoxGeometry(width, height, depth float32) *go_world.Geometry {
-	xOffset := width / 2
-	yOffset := height / 2
-	zOffset := depth / 2
-
-	var vertices = []float32{
-		// Bottom
-		-xOffset, -yOffset, -zOffset,
-		xOffset, -yOffset, -zOffset,
-		-xOffset, -yOffset, zOffset,
-		xOffset, -yOffset, -zOffset,
-		xOffset, -yOffset, zOffset,
-		-xOffset, -yOffset, zOffset,
-
-		// Top
-		-xOffset, yOffset, -zOffset,
-		-xOffset, yOffset, zOffset,
-		xOffset, yOffset, -zOffset,
-		xOffset, yOffset, -zOffset,
-		-xOffset, yOffset, zOffset,
-		xOffset, yOffset, zOffset,
-
-		// Front
-		-xOffset, -yOffset, zOffset,
-		xOffset, -yOffset, zOffset,
-		-xOffset, yOffset, zOffset,
-		xOffset, -yOffset, zOffset,
-		xOffset, yOffset, zOffset,
-		-xOffset, yOffset, zOffset,
-
-		// Back
-		-xOffset, -yOffset, -zOffset,
-		-xOffset, yOffset, -zOffset,
-		xOffset, -yOffset, -zOffset,
-		xOffset, -yOffset, -zOffset,
-		-xOffset, yOffset, -zOffset,
-		xOffset, yOffset, -zOffset,
-
-		// Left
-		-xOffset, -yOffset, zOffset,
-		-xOffset, yOffset, -zOffset,
-		-xOffset, -yOffset, -zOffset,
-		-xOffset, -yOffset, zOffset,
-		-xOffset, yOffset, zOffset,
-		-xOffset, yOffset, -zOffset,
-
-		// Right
-		xOffset, -yOffset, zOffset,
-		xOffset, -yOffset, -zOffset,
-		xOffset, yOffset, -zOffset,
-		xOffset, -yOffset, zOffset,
-		xOffset, yOffset, -zOffset,
-		xOffset, yOffset, zOffset,
-	}
+    vertices := CreateBoxVertices(width,height, depth)
 	geometry := go_world.NewGeometry(vertices)
 	geometry.SetDrawMethod(gl.TRIANGLES)
 	return geometry
@@ -234,6 +192,112 @@ func createOctahedronGeometry() *go_world.Geometry {
 
 	geometry := go_world.NewGeometry(t_to_array(t1, t2, t3, t4, t5, t6, t7, t8))
 	return geometry
+}
+
+/*
+Vertex Creators
+*/
+func CreateBoxVertices(width, height, depth float32) []float32 {
+	xOffset := width / 2
+	yOffset := height / 2
+	zOffset := depth / 2
+
+	var vertices = []float32{
+		// Bottom
+		-xOffset, -yOffset, -zOffset,
+		xOffset, -yOffset, -zOffset,
+		-xOffset, -yOffset, zOffset,
+		xOffset, -yOffset, -zOffset,
+		xOffset, -yOffset, zOffset,
+		-xOffset, -yOffset, zOffset,
+
+		// Top
+		-xOffset, yOffset, -zOffset,
+		-xOffset, yOffset, zOffset,
+		xOffset, yOffset, -zOffset,
+		xOffset, yOffset, -zOffset,
+		-xOffset, yOffset, zOffset,
+		xOffset, yOffset, zOffset,
+
+		// Front
+		-xOffset, -yOffset, zOffset,
+		xOffset, -yOffset, zOffset,
+		-xOffset, yOffset, zOffset,
+		xOffset, -yOffset, zOffset,
+		xOffset, yOffset, zOffset,
+		-xOffset, yOffset, zOffset,
+
+		// Back
+		-xOffset, -yOffset, -zOffset,
+		-xOffset, yOffset, -zOffset,
+		xOffset, -yOffset, -zOffset,
+		xOffset, -yOffset, -zOffset,
+		-xOffset, yOffset, -zOffset,
+		xOffset, yOffset, -zOffset,
+
+		// Left
+		-xOffset, -yOffset, zOffset,
+		-xOffset, yOffset, -zOffset,
+		-xOffset, -yOffset, -zOffset,
+		-xOffset, -yOffset, zOffset,
+		-xOffset, yOffset, zOffset,
+		-xOffset, yOffset, -zOffset,
+
+		// Right
+		xOffset, -yOffset, zOffset,
+		xOffset, -yOffset, -zOffset,
+		xOffset, yOffset, -zOffset,
+		xOffset, -yOffset, zOffset,
+		xOffset, yOffset, -zOffset,
+		xOffset, yOffset, zOffset,
+	}
+    return vertices
+}
+func CreateWireBoxVertices(width, height, depth float32) []float32 {
+	width = width / 2
+	height = height / 2
+	depth = depth / 2
+	var vertices = []float32{
+		//Front
+		-width, -height, depth,
+		width, -height, depth,
+
+		width, -height, depth,
+		width, height, depth,
+
+		width, height, depth,
+		-width, height, depth,
+
+		-width, height, depth,
+		-width, -height, depth,
+
+		//Middle
+		-width, -height, depth,
+		-width, -height, -depth,
+
+		width, -height, depth,
+		width, -height, -depth,
+
+		width, height, depth,
+		width, height, -depth,
+
+		-width, height, depth,
+		-width, height, -depth,
+
+		//Back
+		-width, -height, -depth,
+		width, -height, -depth,
+
+		width, -height, -depth,
+		width, height, -depth,
+
+		width, height, -depth,
+		-width, height, -depth,
+
+		-width, height, -depth,
+		-width, -height, -depth,
+	}
+    return vertices
 }
 
 func to_array(vertices ...mgl32.Vec3) []float32 {

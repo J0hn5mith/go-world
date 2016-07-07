@@ -28,12 +28,16 @@ func (camera *Camera) SetPosition(x, y, z float32) *Camera {
 	return camera
 }
 
+func (camera *Camera) Program() uint32 {
+    return camera.program
+}
+
 func (camera *Camera) updateViewMatrix() {
 	projectionMatrix := mgl32.Perspective(
 		mgl32.DegToRad(45.0),
 		camera.ratio,
 		0.1,
-		30.0,
+		100.0,
 	)
 	projectionUniform := gl.GetUniformLocation(
 		camera.program,

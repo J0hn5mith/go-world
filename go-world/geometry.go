@@ -44,6 +44,7 @@ func (geometry *Geometry) Load(program uint32) *Geometry {
 func (geometry *Geometry) DrawMethod() uint32 {
     return geometry.draw_method
 }
+
 func (geometry *Geometry) SetDrawMethod(method uint32) *Geometry {
 	geometry.draw_method = method
 	return geometry
@@ -53,14 +54,19 @@ func (geometry *Geometry) Vertices() []float32 {
     return geometry.vertices
 }
 
+func (geometry *Geometry) Vao() uint32 {
+    return geometry.vao
+}
+
+
 func (geometry *Geometry) UpdateVertices(vertices []float32) *Geometry {
 	geometry.vertices = vertices
-	gl.BindVertexArray(geometry.vao)
-	gl.BindBuffer(gl.ARRAY_BUFFER, geometry.vbo)
+    gl.BindVertexArray(geometry.vao)
+    gl.BindBuffer(gl.ARRAY_BUFFER, geometry.vbo)
 	gl.BufferData(
 		gl.ARRAY_BUFFER,
-		len(geometry.vertices)*4,
-		gl.Ptr(geometry.vertices),
+		len(vertices)*4,
+		gl.Ptr(vertices),
 		gl.DYNAMIC_DRAW,
 	)
 	return geometry

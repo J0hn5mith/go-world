@@ -2,6 +2,7 @@ package go_world
 
 import (
 	"github.com/go-gl/mathgl/mgl32"
+    "math"
 )
 
 type Collision struct {
@@ -29,4 +30,17 @@ func VectorsToFloats(vertices ...mgl32.Vec3) []float32 {
 		array = append(array, x, y, z)
 	}
 	return array
+}
+
+func angleToCoords(angle float64) (float64, float64) {
+	x := math.Sin(angle)
+	y := math.Cos(angle)
+	return x, y
+}
+func reverse(numbers []interface{}) []interface{} {
+	for i := 0; i < len(numbers)/2; i++ {
+		j := len(numbers) - i - 1
+		numbers[i], numbers[j] = numbers[j], numbers[i]
+	}
+	return numbers
 }
