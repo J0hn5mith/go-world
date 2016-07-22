@@ -12,6 +12,7 @@ type RigidBody struct {
 	centerOfMass    mgl32.Vec3
 	massParticles   []*MassParticle
 	mass            float32
+	static          bool
 }
 
 func NewRigidBody() *RigidBody {
@@ -20,11 +21,20 @@ func NewRigidBody() *RigidBody {
 	return rigidBody
 }
 
-func CreateRigidBody(object *go_world.Object) *RigidBody {
+func CreateDynamicBody(object *go_world.Object) *RigidBody {
+    return CreateBody(object, false)
+}
+
+func CreateStaticBody(object *go_world.Object) *RigidBody {
+    return CreateBody(object, true)
+}
+
+func CreateBody(object *go_world.Object, static bool) *RigidBody {
 	rigidBody := new(RigidBody)
 	rigidBody.object = object
 	rigidBody.velocity = mgl32.Vec3{0, 0, 0}
 	rigidBody.mass = 1.0
+    rigidBody.static = static
 
 	return rigidBody
 }
@@ -86,6 +96,15 @@ func (rigidBody *RigidBody) Mass() float32 {
 func (rigidBody *RigidBody) SetMass(mass float32) PhysicalBody {
 	rigidBody.mass = mass
 	return rigidBody
+}
+
+func (rigidBody *RigidBody) Static() bool {
+    return rigidBody.static
+}
+
+func (rigidBody *RigidBody) SetStatic(static bool) *RigidBody {
+    rigidBody.static = static
+    return rigidBody
 }
 
 func (rigidBody *RigidBody) SetPosition(x, y, z float32) PhysicalBody {

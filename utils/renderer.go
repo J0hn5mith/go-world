@@ -24,7 +24,7 @@ func (debugRenderer * MassParticleDebugRenderer) Renderer() *go_world.Renderer{
 }
 
 func (debugRenderer *MassParticleDebugRenderer ) Render(world *go_world.World) {
-    softBodies := debugRenderer.physics.RigidBodies()
+    softBodies := debugRenderer.physics.Bodies()
     renderer := debugRenderer.Renderer()
     particleGeometry := createCircleGeometry(100, 0.05).Load(renderer.Camera().Program())
     for _, softBody := range softBodies {

@@ -32,9 +32,7 @@ type PhysicalBody interface {
 }
 
 type Physics struct {
-	bodies    []*RigidBody
-	staticBodies     []*RigidBody
-	softBodies       []*SoftBody
+	bodies           []*RigidBody
 	forceFields      []ForceField
 	collisionHandler PhysicsCollisionHandler
 	airResistance    float32
@@ -46,47 +44,28 @@ func NewPhysics() *Physics {
 	return physics
 }
 
-func (physics *Physics) RegisterDynamicObject(object *go_world.Object) *RigidBody {
-	rigidBody := CreateRigidBody(object)
-	physics.bodies = append(physics.bodies, rigidBody)
-	return rigidBody
-}
-
-func (physics *Physics) RigidBodies() []*RigidBody {
-	return append(physics.staticBodies, physics.bodies...)
-}
-
-func (physics *Physics) SoftBodies() []*SoftBody {
-	return physics.softBodies
-}
-
-func (physics *Physics) RegisterSoftBody(body *SoftBody) PhysicalBody {
-	physics.softBodies = append(physics.softBodies, body)
+func (physics *Physics) RegisterObject(object *go_world.Object) *RigidBody {
+	body := CreateDynamicBody(object)
+	physics.bodies = append(physics.bodies, body)
 	return body
 }
 
-func (physics *Physics) RegisterStaticObject(object *go_world.Object) *RigidBody {
-	rigidBody := CreateRigidBody(object)
-	physics.staticBodies = append(physics.staticBodies, rigidBody)
-	return rigidBody
+func (physics *Physics) Bodies() []*RigidBody {
+	return physics.bodies
 }
 
 func (physics *Physics) Update(timeDelta float32) {
-	physics.updateVelocity(timeDelta)
 
-	//physics.applySpringForces(timeDelta)
-    physics.applyForceFields(timeDelta)
+    physics.applySpringForces(timeDelta)
+	physics.applyForceFields(timeDelta)
 	//physics.applyAirResistance(timeDelta)
 
-    physics.updatePosition(timeDelta)
+	physics.updateVelocity(timeDelta)
+	physics.updatePosition(timeDelta)
 
-    if physics.collisionHandler != nil {
-        physics.collisionHandler.Apply(
-            physics.bodies,
-            physics.staticBodies,
-            physics.softBodies,
-        )
-    }
+	if physics.collisionHandler != nil {
+		physics.collisionHandler.Apply(physics.bodies)
+	}
 
 }
 
@@ -100,72 +79,84 @@ func (physics *Physics) AddCollisionHandler(collisionHandler PhysicsCollisionHan
 
 var ALPHA float32 = 1.0
 
+//func (physics *Physics) getPreviousPositions(timeDelta float32) {
+    //var previousPosition []mgl32.Vec3
+    //for particle := range particles {
+        //preivousPositions = append(previousPosition, particle.Position())
+    //}
+//}
 func (physics *Physics) updateVelocity(timeDelta float32) {
 	for _, body := range physics.bodies {
-        cm := getCenterOfMass(body)
-        new_cm := getNewCenterOfMass(body, timeDelta)
-        rotation := getRotationMatrix(body, cm, new_cm,  timeDelta)
-		for _, particle := range body.MassParticles() {
-            goalPosition := particle.Position().Sub(cm)
-            goalPosition  =  mgl32.TransformCoordinate(goalPosition, rotation.Mat4())
-            goalPosition = goalPosition.Add(new_cm)
-            positionDelta := goalPosition.Sub(
-                particle.Position().Add(particle.Velocity().Mul(timeDelta)),
-            )
+		if !body.Static() {
+			cm := getCenterOfMass(body)
+			new_cm := getNewCenterOfMass(body, timeDelta)
+			rotation := getRotationMatrix(body, cm, new_cm, timeDelta)
+			for _, particle := range body.MassParticles() {
+				goalPosition := particle.Position().Sub(cm)
+				goalPosition = mgl32.TransformCoordinate(goalPosition, rotation.Mat4())
+				goalPosition = goalPosition.Add(new_cm)
+				positionDelta := goalPosition.Sub(
+					particle.Position().Add(particle.Velocity().Mul(timeDelta)),
+				)
 
-            v_delta := positionDelta.Mul(ALPHA/timeDelta)
-			v_new := particle.Velocity().Add(v_delta)
-			particle.SetVelocity(
-				v_new.X(),
-				v_new.Y(),
-				v_new.Z(),
-			)
+				v_delta := positionDelta.Mul(ALPHA / timeDelta)
+				v_new := particle.Velocity().Add(v_delta)
+				particle.SetVelocity(
+					v_new.X(),
+					v_new.Y(),
+					v_new.Z(),
+				)
+			}
 		}
 	}
 }
 
 /*
-    Returns the new center of mass for a body. The new center is
-    based on the bodies particle and their current velocity.
+   Returns the new center of mass for a body. The new center is
+   based on the bodies particle and their current velocity.
 */
 func getNewCenterOfMass(body *RigidBody, time_delta float32) mgl32.Vec3 {
-    new_center := mgl32.Vec3{0,0,0}
-    for _, particle := range body.MassParticles() {
-        new_position := particle.Position().Add(particle.Velocity().Mul(time_delta))
-        new_center = new_center.Add(new_position)
-    }
-    return new_center.Mul(1.0/float32(len(body.MassParticles())))
+	new_center := mgl32.Vec3{0, 0, 0}
+	for _, particle := range body.MassParticles() {
+		new_position := particle.Position().Add(particle.Velocity().Mul(time_delta))
+		new_center = new_center.Add(new_position)
+	}
+	return new_center.Mul(1.0 / float32(len(body.MassParticles())))
 }
 
 func getCenterOfMass(body *RigidBody) mgl32.Vec3 {
-    new_center := mgl32.Vec3{0,0,0}
-    for _, particle := range body.MassParticles() {
-        new_center = new_center.Add(particle.Position())
-    }
-    return new_center.Mul(1.0/float32(len(body.MassParticles())))
+	new_center := mgl32.Vec3{0, 0, 0}
+	for _, particle := range body.MassParticles() {
+		new_center = new_center.Add(particle.Position())
+	}
+	return new_center.Mul(1.0 / float32(len(body.MassParticles())))
 }
+//func implicitEuerl(particles, preivousPositions){
+//}
 
 /*
-    Returns the rotation matrix for the next state of a body.
-    The rotation matrix is computed based on the position
-    and velocity of the body's particle.
+   Returns the rotation matrix for the next state of a body.
+   The rotation matrix is computed based on the position
+   and velocity of the body's particle.
 */
 func getRotationMatrix(body *RigidBody, old_center, new_center mgl32.Vec3, time_delta float32) mgl32.Mat3 {
-    var old_positions []mgl32.Vec3
-    var new_positions []mgl32.Vec3
-    for _, particle := range body.MassParticles() {
-        new_position := particle.Position().Add(
-            particle.Velocity().Mul(time_delta),
-        )
-        old_positions = append(old_positions, particle.Position().Sub(old_center))
-        new_positions = append(new_positions, new_position.Sub(new_center))
-    }
-    return ExtractRotationFromPositions(old_positions, new_positions)
+	var old_positions []mgl32.Vec3
+	var new_positions []mgl32.Vec3
+	for _, particle := range body.MassParticles() {
+		new_position := particle.Position().Add(
+			particle.Velocity().Mul(time_delta),
+		)
+		old_positions = append(old_positions, particle.Position().Sub(old_center))
+		new_positions = append(new_positions, new_position.Sub(new_center))
+	}
+	return ExtractRotationFromPositions(old_positions, new_positions)
 }
 
 func (physics *Physics) updatePosition(timeDelta float32) {
 	for _, body := range physics.bodies {
-        physics.updatePositionBody(timeDelta, body)
+		if !body.Static() {
+			physics.updatePositionBody(timeDelta, body)
+		}
 	}
 }
 
@@ -182,8 +173,10 @@ func (physics *Physics) updatePositionBody(timeDelta float32, body PhysicalBody)
 
 func (physics *Physics) applyForceFields(timeDelta float32) {
 	for _, forceField := range physics.forceFields {
-		for _, rigidBody := range physics.bodies {
-			forceField.Apply(rigidBody, timeDelta)
+		for _, body := range physics.bodies {
+			if !body.static {
+				forceField.Apply(body, timeDelta)
+			}
 		}
 	}
 }
@@ -191,24 +184,20 @@ func (physics *Physics) applyForceFields(timeDelta float32) {
 //TODO: Could this iteratoin be done using functional programming? Since I use
 //it twice
 func (physics *Physics) applyAirResistance(timeDelta float32) {
-	for _, forceField := range physics.forceFields {
-		for _, rigidBody := range physics.bodies {
-			rigidBody.velocity = rigidBody.velocity.Mul(physics.airResistance)
-		}
-		for _, softBody := range physics.softBodies {
-			forceField.ApplySoft(softBody, timeDelta)
-			softBody.velocity = softBody.velocity.Mul(physics.airResistance)
-		}
-	}
+	//for _, forceField := range physics.forceFields {
+	//for _, rigidBody := range physics.bodies {
+	//rigidBody.velocity = rigidBody.velocity.Mul(physics.airResistance)
+	//}
+	//}
 }
 
 func (physics *Physics) applySpringForces(timeDelta float32) {
-	for _, softBody := range physics.softBodies {
-		softBody.UpdateSpringForces()
-	}
-	for _, softBody := range physics.softBodies {
-		softBody.ApplySpringForces(timeDelta)
-	}
+	//for _, softBody := range physics.softBodies {
+	//softBody.UpdateSpringForces()
+	//}
+	//for _, softBody := range physics.softBodies {
+	//softBody.ApplySpringForces(timeDelta)
+	//}
 }
 
 type ForceField interface {
@@ -217,5 +206,5 @@ type ForceField interface {
 }
 
 type PhysicsCollisionHandler interface {
-	Apply(bodies, staticBodies []*RigidBody, softBodies []*SoftBody)
+	Apply(bodies []*RigidBody)
 }

@@ -1,9 +1,7 @@
 package go_world_utils
 
 import (
-	"fmt"
 	"github.com/go-gl/mathgl/mgl32"
-	"go-world/go-world"
 	physics "go-world/physics"
 )
 
@@ -43,19 +41,22 @@ func CreateBasicPhysicsCollisionHandler() *BasicPhysicsCollisionHandler {
 	return new(BasicPhysicsCollisionHandler)
 }
 
-func (collisionHandler *BasicPhysicsCollisionHandler) Apply(dynamicBodies, staticBodies []*physics.RigidBody, softBodies []*physics.SoftBody) {
-	for _, bodyA := range dynamicBodies {
-		for _, bodyB := range staticBodies {
+func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.RigidBody) {
+	for _, bodyA := range bodies {
+		for _, bodyB := range bodies {
+            if bodyA == bodyB {
+                continue
+            }
 			for _, particleA := range bodyA.GetMassParticles() {
 				for _, particleB := range bodyB.GetMassParticles() {
-					col := detectCollision(bodyA, bodyB, particleA, particleB)
+					col := physics.DetectInterParticleCollision(particleA, particleB)
 					if col.Magnitude > 0 {
-						fmt.Println("Collision")
+                        shift := col.Direction.Mul(col.Magnitude)
+                        //particleA.ShiftPosition(shift.X(), shift.Y(), 0)
+                        particleB.ShiftPosition(-shift.X(), -shift.Y(), 0)
 					}
 					//v := bodyA.Velocity()
-					//shift := col.Direction.Mul(col.Magnitude)
 					//bodyA.SetVelocity(v.X(), -v.Y(), v.Z())
-					//bodyA.ShiftPosition(shift.X(), shift.Y(), shift.Z())
 
 					//av := bodyA.AngularVelocity().Mul(0.5)
 					//newPos := particleA.Position().Sub(shift)
@@ -80,7 +81,7 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(dynamicBodies, stati
 	}
 }
 
-func detectCollision(bodyA, bodyB physics.PhysicalBody, particleA, particleB *physics.MassParticle) go_world.Collision {
+func detectCollision(bodyA, bodyB physics.PhysicalBody, particleA, particleB *physics.MassParticle) physics.Collision {
 	posA := mgl32.TransformCoordinate(
 		particleA.Position(),
 		bodyA.Object().TransformationMatrix(),
@@ -89,7 +90,7 @@ func detectCollision(bodyA, bodyB physics.PhysicalBody, particleA, particleB *ph
 		particleB.Position(),
 		bodyB.Object().TransformationMatrix(),
 	)
-	return go_world.TestCicrcleCollision(
+	return physics.TestCicrcleCollision(
 		posA,
 		posB,
 		particleA.Radius(),
@@ -97,7 +98,7 @@ func detectCollision(bodyA, bodyB physics.PhysicalBody, particleA, particleB *ph
 	)
 }
 
-func calculateNewVelocity(body1, body2 physics.PhysicalBody, collision go_world.Collision) (mgl32.Vec3, mgl32.Vec3) {
+func calculateNewVelocity(body1, body2 physics.PhysicalBody, collision physics.Collision) (mgl32.Vec3, mgl32.Vec3) {
 	k := (body1.Position().
 		Sub(body2.Position())).
 		Mul(1 / (body1.Position().Sub(body2.Position()).Len()))
