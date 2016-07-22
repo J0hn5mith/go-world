@@ -31,7 +31,7 @@ func (object Object) Geometry() *Geometry {
 
 func (o *Object) SetPosition(x, y, z float32) *Object {
 	o.position = mgl32.Vec3{x, y, z}
-    o.dirty = true
+	o.dirty = true
 	return o
 }
 
@@ -39,21 +39,30 @@ func (o Object) Position() mgl32.Vec3 {
 	return o.position
 }
 
+func (o Object) ShiftPosition(x, y, z float32) mgl32.Vec3 {
+    o.position = mgl32.Vec3{
+        o.position.X() + x,
+        o.position.Y() + y,
+        o.position.Z() + z,
+    }
+	return o.position
+}
+
 func (object *Object) RotateX(angle float32) *Object {
 	object.rotation = object.rotation.Mul4(mgl32.HomogRotate3DX(angle))
-    object.dirty = true
+	object.dirty = true
 	return object
 }
 
 func (object *Object) RotateY(angle float32) *Object {
 	object.rotation = object.rotation.Mul4(mgl32.HomogRotate3DY(angle))
-    object.dirty = true
+	object.dirty = true
 	return object
 }
 
 func (object *Object) RotateZ(angle float32) *Object {
 	object.rotation = object.rotation.Mul4(mgl32.HomogRotate3DZ(angle))
-    object.dirty = true
+	object.dirty = true
 	return object
 }
 
@@ -63,7 +72,7 @@ func (object *Object) Rotation() mgl32.Mat4 {
 
 func (object *Object) SetScale(scale float32) {
 	object.scale = mgl32.Vec3{scale, scale, scale}
-    object.dirty = true
+	object.dirty = true
 }
 
 func (object *Object) TransformationMatrix() mgl32.Mat4 {
@@ -80,9 +89,9 @@ func (object *Object) TransformationMatrix() mgl32.Mat4 {
 			object.scale[2],
 		)
 		object.transformationBuffer = mat.Mul4(scale).Mul4(trans).Mul4(
-            object.rotation,
-        )
-        object.dirty = false
+			object.rotation,
+		)
+		object.dirty = false
 	}
 	return object.transformationBuffer
 }

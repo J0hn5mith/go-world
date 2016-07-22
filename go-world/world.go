@@ -11,7 +11,6 @@ import (
 type World struct {
 	Scene   *Scene
 	camera  *Camera
-	physics *Physics
 	window  *glfw.Window
 	program uint32
 }
@@ -88,23 +87,11 @@ func (w World) Camera() *Camera {
 	return w.camera
 }
 
-func (world *World) Physics() *Physics {
-	return world.physics
-}
-
-func (world *World) SetPhysics(physics *Physics) *World {
-	world.physics = physics
-    return world
-}
-
 func (w World) NewObject(geometry *Geometry) *Object {
 	object := NewObject(geometry)
 	return object
 }
 
 func (world *World) Update(timeDelta float32) *World {
-	if world.physics != nil {
-		world.physics.Update(timeDelta)
-	}
     return world
 }

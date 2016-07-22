@@ -1,7 +1,8 @@
-package go_world
+package go_world_physics
 
 import (
-	"fmt"
+    "fmt"
+	"go-world/go-world"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -9,7 +10,7 @@ var SPRING_CONSTANT float32 = 20000.0
 var DAMPER_CONSTANT float32 = 10.03
 
 type SoftBody struct {
-	object          *Object
+	object          *go_world.Object
 	velocity        mgl32.Vec3
 	angularVelocity mgl32.Vec3
 	centerOfMass    mgl32.Vec3
@@ -18,7 +19,7 @@ type SoftBody struct {
 	springs         []*Spring
 }
 
-func CreateSoftBody(object *Object) *SoftBody {
+func CreateSoftBody(object *go_world.Object) *SoftBody {
 	softBody := new(SoftBody)
 	softBody.object = object
 	softBody.velocity = mgl32.Vec3{0, 0, 0}
@@ -77,7 +78,7 @@ func (softBody *SoftBody) ApplyForce(x, y, z float32) PhysicalBody {
 	return softBody
 }
 
-func (softBody *SoftBody) Object() *Object {
+func (softBody *SoftBody) Object() *go_world.Object {
 	return softBody.object
 }
 
@@ -120,9 +121,9 @@ func (softBody *SoftBody) GetVertices() []float32 {
 	for _, row := range softBody.massParticles {
 		if lastRow != nil {
 			for i, particle := range row {
-				x, y, z := VectorToFloats(lastRow[i].Position())
+				x, y, z := go_world.VectorToFloats(lastRow[i].Position())
 				array = append(array, x, y, z)
-				x, y, z = VectorToFloats(particle.Position())
+				x, y, z = go_world.VectorToFloats(particle.Position())
 				array = append(array, x, y, z)
 				if x == 0 && y == 0 {
 					fmt.Println(x, y, z)

@@ -1,4 +1,4 @@
-package go_world
+package go_world_physics
 
 import (
 	"github.com/go-gl/mathgl/mgl32"
@@ -141,13 +141,20 @@ func AddMassParticle2D(body PhysicalBody, x, y, diameter float32) {
 	offsetY := y / 2
 
 	// TODO: Consider rest of division
+	op := body.Position()
 	for x := 0; x < lenX; x++ {
 		for y := 0; y < lenY; y++ {
-			xPos := -offsetX + radius + float32(x)*diameter
-			yPos := -offsetY + radius + float32(y)*diameter
+			xPos := -offsetX + radius + float32(x)*diameter + op.X()
+			yPos := -offsetY + radius + float32(y)*diameter + op.Y()
+            if x+y == 0{
 			body.AddMassParticle(
-				CreateMassParticle(xPos, yPos, 0, radius),
+				CreateMassParticle(xPos, yPos, 0, radius).SetVelocity(0.1, 0.001, 0),
 			)
+            } else {
+			body.AddMassParticle(
+				CreateMassParticle(xPos, yPos, 0, radius).SetVelocity(0.1, 0, 0),
+			)
+            }
 		}
 	}
 }
