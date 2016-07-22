@@ -41,6 +41,7 @@ func CreateBasicPhysicsCollisionHandler() *BasicPhysicsCollisionHandler {
 	return new(BasicPhysicsCollisionHandler)
 }
 
+
 func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.RigidBody) {
 	for _, bodyA := range bodies {
 		for _, bodyB := range bodies {
@@ -51,30 +52,11 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
 				for _, particleB := range bodyB.GetMassParticles() {
 					col := physics.DetectInterParticleCollision(particleA, particleB)
 					if col.Magnitude > 0 {
-                        shift := col.Direction.Mul(col.Magnitude)
-                        //particleA.ShiftPosition(shift.X(), shift.Y(), 0)
-                        particleB.ShiftPosition(-shift.X(), -shift.Y(), 0)
+                        springForce := col.Direction.Mul( -1 * col.Magnitude  - 10 * particleB.Velocity().Dot(col.Direction))
+                        particleB.ApplyForce(
+                            springForce.X(), springForce.Y(), springForce.Z(),
+                        )
 					}
-					//v := bodyA.Velocity()
-					//bodyA.SetVelocity(v.X(), -v.Y(), v.Z())
-
-					//av := bodyA.AngularVelocity().Mul(0.5)
-					//newPos := particleA.Position().Sub(shift)
-					//_, _, phi := mgl32.CartesianToSpherical(particleA.Position())
-					//_, _, phiN := mgl32.CartesianToSpherical(newPos)
-					//bodyA.SetAngularVelocity(av.X(), av.Y(), phi-phiN)
-
-					//foundCollision = true
-					//break
-					//}
-					//if foundCollision {
-					//break
-					//}
-					//}
-					//if foundCollision {
-					//foundCollision = false
-					//break
-					//}
 				}
 			}
 		}
