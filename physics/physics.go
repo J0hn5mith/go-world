@@ -40,7 +40,7 @@ type Physics struct {
 
 func NewPhysics() *Physics {
 	physics := new(Physics)
-	physics.airResistance = 0.95
+	physics.airResistance = 0.50
 	return physics
 }
 
@@ -57,10 +57,9 @@ func (physics *Physics) Bodies() []*RigidBody {
 func (physics *Physics) Update(timeDelta float32) {
 
     physics.applySpringForces(timeDelta)
-	physics.applyForceFields(timeDelta)
-	//physics.applyAirResistance(timeDelta)
-
-	physics.updateVelocity(timeDelta)
+    physics.applyForceFields(timeDelta)
+    physics.applyAirResistance(timeDelta)
+    physics.updateVelocity(timeDelta)
 	physics.updatePosition(timeDelta)
 
 	if physics.collisionHandler != nil {
@@ -77,13 +76,13 @@ func (physics *Physics) AddCollisionHandler(collisionHandler PhysicsCollisionHan
 	physics.collisionHandler = collisionHandler
 }
 
-var ALPHA float32 = 1.0
+var ALPHA float32 = 1
 
 //func (physics *Physics) getPreviousPositions(timeDelta float32) {
-    //var previousPosition []mgl32.Vec3
-    //for particle := range particles {
-        //preivousPositions = append(previousPosition, particle.Position())
-    //}
+//var previousPosition []mgl32.Vec3
+//for particle := range particles {
+//preivousPositions = append(previousPosition, particle.Position())
+//}
 //}
 func (physics *Physics) updateVelocity(timeDelta float32) {
 	for _, body := range physics.bodies {
@@ -98,7 +97,6 @@ func (physics *Physics) updateVelocity(timeDelta float32) {
 				positionDelta := goalPosition.Sub(
 					particle.Position().Add(particle.Velocity().Mul(timeDelta)),
 				)
-
 				v_delta := positionDelta.Mul(ALPHA / timeDelta)
 				v_new := particle.Velocity().Add(v_delta)
 				particle.SetVelocity(
@@ -131,6 +129,7 @@ func getCenterOfMass(body *RigidBody) mgl32.Vec3 {
 	}
 	return new_center.Mul(1.0 / float32(len(body.MassParticles())))
 }
+
 //func implicitEuerl(particles, preivousPositions){
 //}
 
@@ -184,11 +183,9 @@ func (physics *Physics) applyForceFields(timeDelta float32) {
 //TODO: Could this iteratoin be done using functional programming? Since I use
 //it twice
 func (physics *Physics) applyAirResistance(timeDelta float32) {
-	//for _, forceField := range physics.forceFields {
-	//for _, rigidBody := range physics.bodies {
-	//rigidBody.velocity = rigidBody.velocity.Mul(physics.airResistance)
-	//}
-	//}
+	for _, rigidBody := range physics.bodies {
+		rigidBody.velocity = rigidBody.velocity.Mul(physics.airResistance)
+	}
 }
 
 func (physics *Physics) applySpringForces(timeDelta float32) {
@@ -202,7 +199,6 @@ func (physics *Physics) applySpringForces(timeDelta float32) {
 
 type ForceField interface {
 	Apply(p PhysicalBody, timeDetla float32)
-	ApplySoft(softBody *SoftBody, timeDetla float32)
 }
 
 type PhysicsCollisionHandler interface {

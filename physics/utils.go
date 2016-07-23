@@ -6,12 +6,11 @@ import (
     "github.com/gonum/matrix"
 )
 
-var NUM_OF_ROUNDING_DIGITS int = 8
+var NUM_OF_ROUNDING_DIGITS int = 7
 
 
 /*
     Extracts the rotation matrix regarding the point (0,0)
-
 */
 func ExtractRotationFromPositions(old_positions, new_positions [] mgl32.Vec3) mgl32.Mat3 {
     a := outerProductSum(new_positions, old_positions)

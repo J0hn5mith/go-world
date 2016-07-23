@@ -6,34 +6,22 @@ import (
 )
 
 var G float32 = 9.81
+var K float32 = 250
+var B float32 = 1.5
 
 /*
 Default implementations for the physics stuff
 */
-
 type GravityForceField struct{}
 
 func (forceField *GravityForceField) Apply(body physics.PhysicalBody, time_delta float32) {
-	body.ApplyForce(
-		0,
-		-G*time_delta,
-		0,
-	)
-}
-
-func (forceField *GravityForceField) ApplySoft(softBody *physics.SoftBody, timeDelta float32) {
-	for _, particle := range softBody.GetMassParticles() {
-		particle.SetVelocity(
-			particle.Velocity()[0],
-			particle.Velocity()[1]-G*timeDelta,
-			particle.Velocity()[2],
-		)
-	}
+    body.ApplyForce( 0, -G*time_delta, 0,)
 }
 
 func CreateGravityForceField() *GravityForceField {
 	return new(GravityForceField)
 }
+
 
 type BasicPhysicsCollisionHandler struct{}
 
@@ -41,18 +29,19 @@ func CreateBasicPhysicsCollisionHandler() *BasicPhysicsCollisionHandler {
 	return new(BasicPhysicsCollisionHandler)
 }
 
-
+/*
+    Handles the collision among bodies. Spring forces are used to handle the
+    effect of inter body collision.
+*/
 func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.RigidBody) {
 	for _, bodyA := range bodies {
 		for _, bodyB := range bodies {
-            if bodyA == bodyB {
-                continue
-            }
+            if bodyA == bodyB { continue }
 			for _, particleA := range bodyA.GetMassParticles() {
 				for _, particleB := range bodyB.GetMassParticles() {
 					col := physics.DetectInterParticleCollision(particleA, particleB)
 					if col.Magnitude > 0 {
-                        springForce := col.Direction.Mul( -1 * col.Magnitude  - 10 * particleB.Velocity().Dot(col.Direction))
+                        springForce := col.Direction.Mul( -K * col.Magnitude  - B * particleB.Velocity().Dot(col.Direction))
                         particleB.ApplyForce(
                             springForce.X(), springForce.Y(), springForce.Z(),
                         )

@@ -146,15 +146,9 @@ func AddMassParticle2D(body PhysicalBody, x, y, diameter float32) {
 		for y := 0; y < lenY; y++ {
 			xPos := -offsetX + radius + float32(x)*diameter + op.X()
 			yPos := -offsetY + radius + float32(y)*diameter + op.Y()
-            if x+y == 0{
 			body.AddMassParticle(
-				CreateMassParticle(xPos, yPos, 0, radius).SetVelocity(0.1, 0.001, 0),
+				CreateMassParticle(xPos, yPos, 0, radius),
 			)
-            } else {
-			body.AddMassParticle(
-				CreateMassParticle(xPos, yPos, 0, radius).SetVelocity(0.1, 0, 0),
-			)
-            }
 		}
 	}
 }
