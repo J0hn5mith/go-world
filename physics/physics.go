@@ -13,7 +13,7 @@ type PhysicalBody interface {
 	GetVelocity() mgl32.Vec3 //TODO: Deprecated
 	Velocity() mgl32.Vec3
 
-	SetPosition(x, y, z float32) PhysicalBody
+	SetPosition(position mgl32.Vec3) PhysicalBody
 	Position() mgl32.Vec3
 	ShiftPosition(x, y, z float32) PhysicalBody
 
@@ -21,9 +21,9 @@ type PhysicalBody interface {
 	AngularVelocity() mgl32.Vec3
 
 	AddMassParticle(particle *MassParticle) PhysicalBody
-	GetMassParticles() []*MassParticle
+	MassParticles() []*MassParticle
 
-	ApplyForce(x, y, z float32) PhysicalBody
+	ApplyForce(force mgl32.Vec3) PhysicalBody
 
 	Object() *go_world.Object
 
@@ -45,7 +45,8 @@ func NewPhysics() *Physics {
 }
 
 func (physics *Physics) RegisterObject(object *go_world.Object) *RigidBody {
-	body := CreateDynamicBody(object)
+	body := CreateDynamicBody()
+    body.object = object
 	physics.bodies = append(physics.bodies, body)
 	return body
 }
@@ -54,12 +55,17 @@ func (physics *Physics) Bodies() []*RigidBody {
 	return physics.bodies
 }
 
+func (physics *Physics) RegisterBody(body *RigidBody) *Physics {
+	physics.bodies = append(physics.bodies, body)
+    return physics
+}
+
 func (physics *Physics) Update(timeDelta float32) {
 
-    physics.applySpringForces(timeDelta)
-    physics.applyForceFields(timeDelta)
-    physics.applyAirResistance(timeDelta)
-    physics.updateVelocity(timeDelta)
+	physics.applySpringForces(timeDelta)
+	physics.applyForceFields(timeDelta)
+	physics.applyAirResistance(timeDelta)
+	physics.updateVelocity(timeDelta)
 	physics.updatePosition(timeDelta)
 
 	if physics.collisionHandler != nil {
@@ -160,13 +166,9 @@ func (physics *Physics) updatePosition(timeDelta float32) {
 }
 
 func (physics *Physics) updatePositionBody(timeDelta float32, body PhysicalBody) {
-	for _, particle := range body.GetMassParticles() {
-		v := particle.Velocity()
-		particle.ShiftPosition(
-			v.X()*timeDelta,
-			v.Y()*timeDelta,
-			v.Z()*timeDelta,
-		)
+	for _, particle := range body.MassParticles() {
+		delta := particle.Velocity().Mul(timeDelta)
+		particle.ShiftPosition(delta)
 	}
 }
 
@@ -189,11 +191,9 @@ func (physics *Physics) applyAirResistance(timeDelta float32) {
 }
 
 func (physics *Physics) applySpringForces(timeDelta float32) {
-	//for _, softBody := range physics.softBodies {
-	//softBody.UpdateSpringForces()
-	//}
-	//for _, softBody := range physics.softBodies {
-	//softBody.ApplySpringForces(timeDelta)
+    // Not used because I removed the soft body class
+	//for _, body := range physics.bodies {
+		//body.UpdateSpringForces()
 	//}
 }
 

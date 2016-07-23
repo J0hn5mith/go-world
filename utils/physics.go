@@ -6,16 +6,17 @@ import (
 )
 
 var G float32 = 9.81
-var K float32 = 250
+var K float32 = 600
 var B float32 = 1.5
 
 /*
 Default implementations for the physics stuff
 */
+
 type GravityForceField struct{}
 
 func (forceField *GravityForceField) Apply(body physics.PhysicalBody, time_delta float32) {
-    body.ApplyForce( 0, -G*time_delta, 0,)
+    body.ApplyForce( mgl32.Vec3{0, -G*time_delta, 0,})
 }
 
 func CreateGravityForceField() *GravityForceField {
@@ -37,14 +38,20 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
 	for _, bodyA := range bodies {
 		for _, bodyB := range bodies {
             if bodyA == bodyB { continue }
-			for _, particleA := range bodyA.GetMassParticles() {
-				for _, particleB := range bodyB.GetMassParticles() {
+			for _, particleA := range bodyA.MassParticles() {
+				for _, particleB := range bodyB.MassParticles() {
 					col := physics.DetectInterParticleCollision(particleA, particleB)
 					if col.Magnitude > 0 {
-                        springForce := col.Direction.Mul( -K * col.Magnitude  - B * particleB.Velocity().Dot(col.Direction))
-                        particleB.ApplyForce(
-                            springForce.X(), springForce.Y(), springForce.Z(),
-                        )
+                        if !bodyA.Static() {
+                            springForce := col.Direction.Mul( -K * -col.Magnitude  - B * particleA.Velocity().Dot(col.Direction))
+                            particleA.ApplyForce(springForce)
+                        }
+                        if !bodyB.Static() {
+                            springForce := col.Direction.Mul( -K * col.Magnitude  - B * particleB.Velocity().Dot(col.Direction))
+                            particleB.ApplyForce(springForce)
+                        }
+                        //friction := particleB.Velocity().Mul(-0.70)
+                        //particleB.ApplyForce(friction)
 					}
 				}
 			}
