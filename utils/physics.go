@@ -6,8 +6,9 @@ import (
 )
 
 var G float32 = 9.81
-var K float32 = 600
-var B float32 = 1.5
+var K float32 = 500
+var B float32 = 1.641
+var FRICTION float32 = 0.00
 
 /*
 Default implementations for the physics stuff
@@ -45,13 +46,15 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
                         if !bodyA.Static() {
                             springForce := col.Direction.Mul( -K * -col.Magnitude  - B * particleA.Velocity().Dot(col.Direction))
                             particleA.ApplyForce(springForce)
+                            friction := particleB.Velocity().Mul(-FRICTION)
+                            particleB.ApplyForce(friction)
                         }
                         if !bodyB.Static() {
                             springForce := col.Direction.Mul( -K * col.Magnitude  - B * particleB.Velocity().Dot(col.Direction))
                             particleB.ApplyForce(springForce)
+                            friction := particleB.Velocity().Mul(-FRICTION)
+                            particleB.ApplyForce(friction)
                         }
-                        //friction := particleB.Velocity().Mul(-0.70)
-                        //particleB.ApplyForce(friction)
 					}
 				}
 			}
@@ -68,7 +71,7 @@ func detectCollision(bodyA, bodyB physics.PhysicalBody, particleA, particleB *ph
 		particleB.Position(),
 		bodyB.Object().TransformationMatrix(),
 	)
-	return physics.TestCicrcleCollision(
+	return physics.CircleCollision(
 		posA,
 		posB,
 		particleA.Radius(),

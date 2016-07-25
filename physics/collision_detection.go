@@ -12,11 +12,12 @@ type Collision struct {
 /*
    Checks two circles for a collision based on their center and radius
 */
-func TestCicrcleCollision(p1, p2 mgl32.Vec3, r1, r2 float32) Collision {
-	magnitude := -(p1.Sub(p2).Len() - (r1 + r2))
+func CircleCollision(p1, p2 mgl32.Vec3, r1, r2 float32) Collision {
+    distance := p1.Sub(p2).Len()
+	magnitude := -(distance - (r1 + r2))
 	if magnitude > 0 {
-		spring := p1.Sub(p2).Normalize()
-		return Collision{spring, magnitude}
+		normal := p1.Sub(p2).Normalize()
+		return Collision{normal, magnitude}
 	}
 	return Collision{mgl32.Vec3{0, 0, 0}, 0}
 }
@@ -25,7 +26,7 @@ func TestCicrcleCollision(p1, p2 mgl32.Vec3, r1, r2 float32) Collision {
    Checks two particle for a collision
 */
 func DetectInterParticleCollision(particleA, particleB *MassParticle) Collision {
-	return TestCicrcleCollision(
+	return CircleCollision(
 		particleA.Position(),
 		particleB.Position(),
 		particleA.Radius(),

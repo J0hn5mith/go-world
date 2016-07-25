@@ -31,3 +31,11 @@ func reverse(numbers []interface{}) []interface{} {
 	}
 	return numbers
 }
+
+func Max32(a , b float32) float32 {
+    return float32(math.Max(float64(a), float64(b)))
+}
+
+func Min32(a , b float32) float32 {
+    return float32(math.Min(float64(a), float64(b)))
+}

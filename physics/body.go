@@ -41,8 +41,12 @@ func CreateBody(static bool) *RigidBody {
 	return body
 }
 
-func (body *RigidBody) SetVelocity(x, y, z float32) PhysicalBody {
-	body.velocity = mgl32.Vec3{x, y, z}
+func (body *RigidBody) SetVelocity(velocity mgl32.Vec3) PhysicalBody {
+	body.velocity = velocity
+    for _, particle := range body.MassParticles() {
+        particle.SetVelocity(velocity)
+    }
+
 	return body
 }
 

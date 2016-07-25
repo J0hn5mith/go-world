@@ -9,7 +9,7 @@ import (
 Extends a plain object with a physical representation
 */
 type PhysicalBody interface {
-	SetVelocity(x, y, z float32) PhysicalBody
+	SetVelocity(velocity mgl32.Vec3) PhysicalBody
 	GetVelocity() mgl32.Vec3 //TODO: Deprecated
 	Velocity() mgl32.Vec3
 
@@ -105,11 +105,7 @@ func (physics *Physics) updateVelocity(timeDelta float32) {
 				)
 				v_delta := positionDelta.Mul(ALPHA / timeDelta)
 				v_new := particle.Velocity().Add(v_delta)
-				particle.SetVelocity(
-					v_new.X(),
-					v_new.Y(),
-					v_new.Z(),
-				)
+				particle.SetVelocity(v_new)
 			}
 		}
 	}
