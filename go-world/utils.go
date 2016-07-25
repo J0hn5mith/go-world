@@ -5,7 +5,6 @@ import (
     "math"
 )
 
-
 func VectorToFloats(vector mgl32.Vec3) (x, y, z float32) {
 		return vector[0], vector[1], vector[2]
 }
@@ -39,3 +38,12 @@ func Max32(a , b float32) float32 {
 func Min32(a , b float32) float32 {
     return float32(math.Min(float64(a), float64(b)))
 }
+
+func Sqrt32(a float32) float32{
+    return float32(math.Sqrt(float64(a)))
+}
+
+func Pow32(a, b float32) float32{
+    return float32(math.Pow(float64(a), float64(b)))
+}
+

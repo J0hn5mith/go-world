@@ -15,7 +15,7 @@ func CreateBoxGeometry(x, y, z float32) *go_world.Geometry {
 }
 
 func CreateWireBoxGeometry(width, height, depth float32) *go_world.Geometry {
-    vertices := CreateWireBoxVertices(width, height, depth)
+	vertices := CreateWireBoxVertices(width, height, depth)
 	geometry := go_world.NewGeometry(vertices)
 	geometry.SetDrawMethod(gl.LINES)
 	return geometry
@@ -48,6 +48,9 @@ func CreateLineLoopGeometry(points ...mgl32.Vec3) *go_world.Geometry {
 	return geometry
 }
 
+func CreateCircleLineGeometry(num_vertices int, radius float32) *go_world.Geometry {
+	return CreateCircleLineGeometry(num_vertices, radius)
+}
 func CreateCircleGeometry(num_vertices int, radius float32) *go_world.Geometry {
 	return createCircleGeometry(num_vertices, radius)
 }
@@ -130,9 +133,38 @@ func createCubeGeometry(sideLength float32) *go_world.Geometry {
 }
 
 func createBoxGeometry(width, height, depth float32) *go_world.Geometry {
-    vertices := CreateBoxVertices(width,height, depth)
+	vertices := CreateBoxVertices(width, height, depth)
 	geometry := go_world.NewGeometry(vertices)
 	geometry.SetDrawMethod(gl.TRIANGLES)
+	return geometry
+}
+
+func createCircleLineGeometry(num_vertices int, radius float32) *go_world.Geometry {
+	vertices := []float32{}
+
+	px, py := angleToCoords(0)
+
+	for i := 1; i < int(num_vertices); i++ {
+		var angle float64 = (2 * math.Pi * float64(i) / float64(num_vertices))
+		x, y := angleToCoords(angle)
+		vertices = append(
+			vertices,
+			float32(x)*radius, float32(y)*radius, 0.0,
+			float32(px)*radius, float32(py)*radius, 0.0,
+		)
+		px = x
+		py = y
+	}
+
+	x, y := angleToCoords(0)
+	vertices = append(
+		vertices,
+		float32(x)*radius, float32(y)*radius, 0.0,
+		float32(px)*radius, float32(py)*radius, 0.0,
+	)
+
+	geometry := go_world.NewGeometry(vertices)
+	geometry.SetDrawMethod(gl.LINE_LOOP)
 	return geometry
 }
 
@@ -251,7 +283,7 @@ func CreateBoxVertices(width, height, depth float32) []float32 {
 		xOffset, yOffset, -zOffset,
 		xOffset, yOffset, zOffset,
 	}
-    return vertices
+	return vertices
 }
 func CreateWireBoxVertices(width, height, depth float32) []float32 {
 	width = width / 2
@@ -297,7 +329,7 @@ func CreateWireBoxVertices(width, height, depth float32) []float32 {
 		-width, height, -depth,
 		-width, -height, -depth,
 	}
-    return vertices
+	return vertices
 }
 
 func to_array(vertices ...mgl32.Vec3) []float32 {

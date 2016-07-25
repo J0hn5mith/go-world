@@ -29,6 +29,9 @@ type PhysicalBody interface {
 
 	Mass() float32
 	SetMass(mass float32) PhysicalBody
+
+    AddBoundingSphere(boundingSphere *Sphere) *RigidBody
+    BoundingSpheres() []*Sphere
 }
 
 type Physics struct {
@@ -107,6 +110,10 @@ func (physics *Physics) updateVelocity(timeDelta float32) {
 				v_new := particle.Velocity().Add(v_delta)
 				particle.SetVelocity(v_new)
 			}
+
+            // TODO: Shift to better place, makes no sense that's here
+            shift := new_cm.Sub(cm)
+            body.ShiftBoundingSpheres(shift)
 		}
 	}
 }

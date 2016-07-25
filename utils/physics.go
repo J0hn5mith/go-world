@@ -3,12 +3,13 @@ package go_world_utils
 import (
 	"github.com/go-gl/mathgl/mgl32"
 	physics "go-world/physics"
+	"go-world/go-world"
 )
 
 var G float32 = 9.81
-var K float32 = 500
-var B float32 = 1.641
-var FRICTION float32 = 0.00
+var K float32 = 250
+var B float32 = 1.241
+var FRICTION float32 = 0.10
 
 /*
 Default implementations for the physics stuff
@@ -39,18 +40,25 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
 	for _, bodyA := range bodies {
 		for _, bodyB := range bodies {
             if bodyA == bodyB { continue }
+            if len(physics.InterSphereCollisions(
+                bodyA.BoundingSpheres(), bodyB.BoundingSpheres(),
+            )) < 1 {
+                continue
+            }
 			for _, particleA := range bodyA.MassParticles() {
 				for _, particleB := range bodyB.MassParticles() {
 					col := physics.DetectInterParticleCollision(particleA, particleB)
 					if col.Magnitude > 0 {
+                        //mag := go_world.Pow32(1 + col.Magnitude, 2) - 1
+                        mag := go_world.Pow32(1 + col.Magnitude, 5) - 1
                         if !bodyA.Static() {
-                            springForce := col.Direction.Mul( -K * -col.Magnitude  - B * particleA.Velocity().Dot(col.Direction))
+                            springForce := col.Direction.Mul( -K * -mag  - B * particleA.Velocity().Dot(col.Direction))
                             particleA.ApplyForce(springForce)
                             friction := particleB.Velocity().Mul(-FRICTION)
                             particleB.ApplyForce(friction)
                         }
                         if !bodyB.Static() {
-                            springForce := col.Direction.Mul( -K * col.Magnitude  - B * particleB.Velocity().Dot(col.Direction))
+                            springForce := col.Direction.Mul( -K * mag  - B * particleB.Velocity().Dot(col.Direction))
                             particleB.ApplyForce(springForce)
                             friction := particleB.Velocity().Mul(-FRICTION)
                             particleB.ApplyForce(friction)

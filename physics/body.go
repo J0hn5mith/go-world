@@ -14,6 +14,7 @@ type RigidBody struct {
 	massParticles   []*MassParticle
 	mass            float32
 	static          bool
+	boundingSpheres []*Sphere
 }
 
 func NewRigidBody() *RigidBody {
@@ -23,11 +24,11 @@ func NewRigidBody() *RigidBody {
 }
 
 func CreateDynamicBody() *RigidBody {
-    return CreateBody(false)
+	return CreateBody(false)
 }
 
 func CreateStaticBody() *RigidBody {
-    return CreateBody(true)
+	return CreateBody(true)
 }
 
 func CreateBody(static bool) *RigidBody {
@@ -36,16 +37,16 @@ func CreateBody(static bool) *RigidBody {
 	body.position = mgl32.Vec3{0, 0, 0}
 	body.velocity = mgl32.Vec3{0, 0, 0}
 	body.mass = 1.0
-    body.static = static
+	body.static = static
 
 	return body
 }
 
 func (body *RigidBody) SetVelocity(velocity mgl32.Vec3) PhysicalBody {
 	body.velocity = velocity
-    for _, particle := range body.MassParticles() {
-        particle.SetVelocity(velocity)
-    }
+	for _, particle := range body.MassParticles() {
+		particle.SetVelocity(velocity)
+	}
 
 	return body
 }
@@ -96,27 +97,28 @@ func (body *RigidBody) SetMass(mass float32) PhysicalBody {
 }
 
 func (body *RigidBody) Static() bool {
-    return body.static
+	return body.static
 }
 
 func (body *RigidBody) SetStatic(static bool) *RigidBody {
-    body.static = static
-    return body
+	body.static = static
+	return body
 }
 
 func (body *RigidBody) SetPosition(position mgl32.Vec3) PhysicalBody {
-    if body.object != nil {
-	    body.object.SetPosition(
-            position.X(),
-            position.Y(),
-            position.Z(),
-        )
-    }
-    shift := position.Sub(body.position)
-    for _, particle := range(body.MassParticles()){
-        particle.ShiftPosition(shift)
-    }
-    body.position = position
+	if body.object != nil {
+		body.object.SetPosition(
+			position.X(),
+			position.Y(),
+			position.Z(),
+		)
+	}
+	shift := position.Sub(body.position)
+	for _, particle := range body.MassParticles() {
+		particle.ShiftPosition(shift)
+	}
+    body.ShiftBoundingSpheres(shift)
+	body.position = position
 	return body
 }
 
@@ -132,4 +134,20 @@ func (body *RigidBody) ShiftPosition(x, y, z float32) PhysicalBody {
 		p[2]+z,
 	)
 	return body
+}
+
+func (body *RigidBody) BoundingSpheres() []*Sphere {
+	return body.boundingSpheres
+}
+
+func (body *RigidBody) AddBoundingSphere(boundingSphere *Sphere) *RigidBody {
+	body.boundingSpheres = append(body.boundingSpheres, boundingSphere)
+	return body
+}
+
+func (body *RigidBody) ShiftBoundingSpheres(shift mgl32.Vec3) *RigidBody{
+	for _, sphere := range body.BoundingSpheres() {
+		sphere.Position = sphere.Position.Add(shift)
+	}
+    return body
 }
