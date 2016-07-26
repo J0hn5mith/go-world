@@ -1,5 +1,4 @@
 package go_world_physics
-
 import (
     "github.com/go-gl/mathgl/mgl32"
     "github.com/gonum/matrix/mat64"

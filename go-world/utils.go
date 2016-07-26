@@ -18,17 +18,31 @@ func VectorsToFloats(vertices ...mgl32.Vec3) []float32 {
 	return array
 }
 
+func AngleToCoordinates32(angle float32) (float32, float32) {
+    x, y := AngleToCoordinates(float64(angle))
+    return float32(x), float32(y)
+}
+
+func AngleToCoordinates(angle float64) (float64, float64) {
+    return angleToCoords(angle)
+}
+
 func angleToCoords(angle float64) (float64, float64) {
-	x := math.Sin(angle)
-	y := math.Cos(angle)
+	x := math.Cos(angle)
+	y := math.Sin(angle)
 	return x, y
 }
+
 func reverse(numbers []interface{}) []interface{} {
 	for i := 0; i < len(numbers)/2; i++ {
 		j := len(numbers) - i - 1
 		numbers[i], numbers[j] = numbers[j], numbers[i]
 	}
 	return numbers
+}
+
+func Abs32(a float32) float32 {
+    return float32(math.Abs(float64(a)))
 }
 
 func Max32(a , b float32) float32 {

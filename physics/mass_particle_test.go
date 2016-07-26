@@ -10,5 +10,4 @@ func TestCreateSphereTree(t * testing.T){
     if tree.CreateSphereTree(rectangle, 0.5).root == nil{
         t.Error("Test")
     }
-    t.Error(len(tree.leafs))
 }

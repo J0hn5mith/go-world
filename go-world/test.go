@@ -1,7 +1,6 @@
 package go_world
 //import (
     //"github.com/go-gl/mathgl/mgl32"
-    //"fmt"
 //)
 
 //func vertex_to_array( v mgl32.Vec3) ([3]float32) {

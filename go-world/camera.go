@@ -44,7 +44,6 @@ func (camera *Camera) updateViewMatrix() {
 		gl.Str("projection\x00"),
 	)
 	gl.UniformMatrix4fv(projectionUniform, 1, false, &projectionMatrix[0])
-
     viewMatrix := mgl32.LookAtV(
         camera.position,
         mgl32.Vec3{0, 0, 0},
