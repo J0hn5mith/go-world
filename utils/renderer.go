@@ -27,7 +27,7 @@ func (debugRenderer *MassParticleDebugRenderer) Render(world *go_world.World) {
 	bodies := debugRenderer.physics.Bodies()
 	renderer := debugRenderer.Renderer()
 	for _, body := range bodies {
-		renderParticles(renderer, body)
+        renderParticles(renderer, body)
 		renderBoundingSpheres(renderer, body)
 	}
 }

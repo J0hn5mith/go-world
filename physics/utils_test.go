@@ -5,7 +5,7 @@ import (
 )
 
 func TestOuterProductSum(t *testing.T) {
-    t.Skip()
+    //t.Skip()
     points := []mgl32.Vec3{{1, 1, 1},{1,1,1}, {1,1,1}}
     check := outerProductSum(points, points)
     for _, value := range(check){
@@ -18,17 +18,17 @@ func TestOuterProductSum(t *testing.T) {
 func TestExtractRotationMatrix(t *testing.T) {
     //t.Skip()
     // Simplest test
-    matrix := mgl32.Mat3{
-        1, 1, 1,
-        1, 1, 1,
-        1, 1, 1,
-    }
-    check := ExtractRotationFromMatrix(matrix)
-    for _, value := range(check.Diag()){
-        if value != 1 {
-            t.Error("1 != ", value)
-        }
-    }
+    //matrix := mgl32.Mat3{
+        //1, 1, 1,
+        //1, 1, 1,
+        //1, 1, 1,
+    //}
+    //check := ExtractRotationFromMatrix(matrix)
+    //for _, value := range(check.Diag()){
+        //if value != 1 {
+            //t.Error("1 != ", value)
+        //}
+    //}
 
     // Test for simple case
     points_a := []mgl32.Vec3{{-1,0,0}, {1,0,0}}

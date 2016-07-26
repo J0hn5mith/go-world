@@ -4,13 +4,30 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+type Rectangle struct {
+	Position  mgl32.Vec3
+	Dimension mgl32.Vec3
+}
+
 type Sphere struct {
 	Position mgl32.Vec3
 	Radius   float32
 }
+
 type Collision struct {
 	Direction mgl32.Vec3
 	Magnitude float32
+}
+
+type SphereTreeNode struct {
+    sphere *Sphere
+    subNodes [2]*SphereTreeNode
+}
+
+type SphereTree struct {
+    root *SphereTreeNode
+    position mgl32.Vec3
+    leafs []*SphereTreeNode
 }
 
 /*
@@ -28,7 +45,7 @@ func CircleCollision(p1, p2 mgl32.Vec3, r1, r2 float32) Collision {
 }
 
 func SphereCollision(sphereA, sphereB *Sphere) Collision {
-    delta := sphereA.Position.Sub(sphereB.Position)
+	delta := sphereA.Position.Sub(sphereB.Position)
 	distance := delta.Len()
 	magnitude := -(distance - (sphereA.Radius + sphereB.Radius))
 	if magnitude > 0 {
@@ -54,7 +71,7 @@ func InterSphereCollisions(spheresA, spheresB []*Sphere) []Collision {
 	var collisions []Collision
 	for _, sphereA := range spheresA {
 		for _, sphereB := range spheresB {
-            collision := SphereCollision(sphereA, sphereB)
+			collision := SphereCollision(sphereA, sphereB)
 			if collision.Magnitude > 0 {
 				collisions = append(collisions, collision)
 			}

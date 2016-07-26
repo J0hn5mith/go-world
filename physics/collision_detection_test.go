@@ -22,8 +22,8 @@ func TestCircleCollision(t * testing.T){
     }
 
     c4 := CircleCollision(mgl.Vec3{0,0,0}, mgl.Vec3{0.5,0,0}, 1, 1)
-    if c4.Magnitude !=  1 {
-        t.Error("Magnitude is incorrect", c4.Magnitude, "!= 1")
+    if c4.Magnitude !=  1.5 {
+        t.Error("Magnitude is incorrect", c4.Magnitude, "!= 1.5")
     }
 
 
