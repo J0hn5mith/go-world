@@ -44,19 +44,19 @@ func (r *Renderer) Render(world *World) {
 	glfw.PollEvents()
 }
 
-func (r *Renderer) render(scene *Scene) {
-	gl.UseProgram(r.camera.program)
+func (renderer *Renderer) render(scene *Scene) {
+	gl.UseProgram(renderer.camera.program)
 	for _, object := range scene.objects {
 		uniColor := gl.GetUniformLocation(
-			r.camera.program,
+			renderer.camera.program,
 			gl.Str("modelColor\x00"),
 		)
-		gl.Uniform3f(uniColor,
-			object.geometry.color[0],
-			object.geometry.color[1],
-			object.geometry.color[2],
-		)
-		r.renderObject(object)
+        r, g, b := Vec3To32(object.Geometry().Color()).Elem()
+		gl.Uniform3f(uniColor, r, g, b)
+			//object.geometry.color[0],
+			//object.geometry.color[1],
+			//object.geometry.color[2],
+		renderer.renderObject(object)
 	}
 }
 

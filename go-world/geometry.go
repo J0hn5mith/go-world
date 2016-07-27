@@ -2,13 +2,13 @@ package go_world
 
 import (
 	"github.com/go-gl/gl/v4.1-core/gl"
-	"github.com/go-gl/mathgl/mgl32"
+	mgl "github.com/go-gl/mathgl/mgl64"
 )
 
 type Geometry struct {
 	vertices    []float32
 	drawMethod uint32
-	color       mgl32.Vec3
+	color       mgl.Vec3
 	program     uint32
 	vao         uint32
 	vbo         uint32
@@ -17,7 +17,7 @@ type Geometry struct {
 func NewGeometry(vertices []float32) *Geometry {
 	geometry := new(Geometry)
 	geometry.vertices = vertices
-	geometry.color = mgl32.Vec3{0, 0, 0}
+	geometry.color = mgl.Vec3{0, 0, 0}
     geometry.program = 0
 	return geometry
 }
@@ -25,9 +25,13 @@ func NewGeometry(vertices []float32) *Geometry {
 /*
 Sets the color of the geometry object.
 */
-func (geometry *Geometry) SetColorRGB(r, g, b float32) *Geometry {
-	geometry.color = mgl32.Vec3{r, g, b}
+func (geometry *Geometry) SetColorRGB(r, g, b float64) *Geometry {
+	geometry.color = mgl.Vec3{r, g, b}
 	return geometry
+}
+
+func (geometry *Geometry) Color() mgl.Vec3 {
+    return geometry.color
 }
 
 /*
