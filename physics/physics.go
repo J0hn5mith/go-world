@@ -15,7 +15,7 @@ type PhysicalBody interface {
 
 	SetPosition(position mgl32.Vec3) PhysicalBody
 	Position() mgl32.Vec3
-	ShiftPosition(x, y, z float32) PhysicalBody
+	ShiftPosition(mgl32.Vec3) PhysicalBody
 
 	SetAngularVelocity(x, y, z float32) PhysicalBody
 	AngularVelocity() mgl32.Vec3

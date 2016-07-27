@@ -87,3 +87,11 @@ func Mat4To32(matrix mgl64.Mat4) mgl32.Mat4 {
 		float32(matrix[12]), float32(matrix[13]), float32(matrix[14]), float32(matrix[15]),
 	}
 }
+
+func Vec3To64(vector mgl32.Vec3) mgl64.Vec3 {
+	return mgl64.Vec3{
+		float64(vector.X()),
+		float64(vector.Y()),
+		float64(vector.Z()),
+	}
+}

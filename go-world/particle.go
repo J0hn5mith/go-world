@@ -1,12 +1,15 @@
 package go_world
 
 import (
-	"github.com/go-gl/mathgl/mgl32"
+	mgl "github.com/go-gl/mathgl/mgl64"
 )
 
+/*
+TODO: Deprecated
+*/
 type Particle struct {
 	object   *Object
-	velocity mgl32.Vec3
+	velocity mgl.Vec3
 	mass     float32
 	radius   float32
 	scene    *Scene
@@ -21,21 +24,18 @@ func NewParticle(scene *Scene) *Particle {
 	return particle
 }
 
-func (p *Particle) SetVelocity(x, y, z float32) *Particle{
-	p.velocity[0] = x
-	p.velocity[1] = y
-	p.velocity[2] = z
+func (p *Particle) SetVelocity(velocity mgl.Vec3) *Particle{
+    p.velocity = velocity
     return p
 }
 
-func (p *Particle) Velocity() mgl32.Vec3 {
+func (p *Particle) Velocity() mgl.Vec3 {
 	return p.velocity
 }
 
-func (p *Particle) ApplyForce(x, y, z float32) {
-	p.velocity[0] = p.velocity[0] + x
-	p.velocity[1] = p.velocity[1] + y
-	p.velocity[2] = p.velocity[2] + z
+func (p *Particle) ApplyForce(force mgl.Vec3) *Particle{
+    p.velocity = p.Velocity().Add(force)
+    return p
 }
 
 func (p Particle) Object() *Object {
@@ -52,12 +52,12 @@ func (p *Particle) SetRadius(radius float32) *Particle {
 	return p
 }
 
-func (p *Particle) Position() mgl32.Vec3 {
-	return p.object.Position()
+func (p *Particle) Position() mgl.Vec3 {
+	return p.Object().Position()
 }
 
-func (p *Particle) SetPosition(x, y, z float32) *Particle{
-	p.object.SetPosition(x, y, z)
+func (p *Particle) SetPosition(position mgl.Vec3) *Particle{
+	p.Object().SetPosition(position)
     return p
 }
 
@@ -167,12 +167,12 @@ func (particleSystem *ParticleSystem) handleCollisions() {
 }
 
 func (particleSystem *ParticleSystem) animate(time_delta float32) {
-	for _, particle := range particleSystem.particles {
+	//for _, particle := range particleSystem.particles {
 
-		particle.object.position[0] += (float32)(particle.velocity[0] * time_delta)
-		particle.object.position[1] += (float32)(particle.velocity[1] * time_delta)
-		particle.object.position[2] += (float32)(particle.velocity[2] * time_delta)
-	}
+		//particle.object.position[0] += (float32)(particle.velocity[0] * time_delta)
+		//particle.object.position[1] += (float32)(particle.velocity[1] * time_delta)
+		//particle.object.position[2] += (float32)(particle.velocity[2] * time_delta)
+	//}
 }
 
 type ParticleForceField interface {

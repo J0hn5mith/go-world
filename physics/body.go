@@ -107,17 +107,13 @@ func (body *RigidBody) SetStatic(static bool) *RigidBody {
 
 func (body *RigidBody) SetPosition(position mgl32.Vec3) PhysicalBody {
 	if body.object != nil {
-		body.object.SetPosition(
-			position.X(),
-			position.Y(),
-			position.Z(),
-		)
+		body.object.SetPosition(go_world.Vec3To64(position))
 	}
 	shift := position.Sub(body.position)
 	for _, particle := range body.MassParticles() {
 		particle.ShiftPosition(shift)
 	}
-    body.ShiftBoundingSpheres(shift)
+	body.ShiftBoundingSpheres(shift)
 	body.position = position
 	return body
 }
@@ -126,13 +122,9 @@ func (body *RigidBody) Position() mgl32.Vec3 {
 	return body.position
 }
 
-func (body *RigidBody) ShiftPosition(x, y, z float32) PhysicalBody {
-	p := body.Position()
-	body.object.SetPosition(
-		p[0]+x,
-		p[1]+y,
-		p[2]+z,
-	)
+func (body *RigidBody) ShiftPosition(shift mgl32.Vec3) PhysicalBody {
+	p := body.Position().Add(shift)
+	body.object.SetPosition(go_world.Vec3To64(p))//TODO
 	return body
 }
 
@@ -145,9 +137,9 @@ func (body *RigidBody) AddBoundingSphere(boundingSphere *Sphere) *RigidBody {
 	return body
 }
 
-func (body *RigidBody) ShiftBoundingSpheres(shift mgl32.Vec3) *RigidBody{
+func (body *RigidBody) ShiftBoundingSpheres(shift mgl32.Vec3) *RigidBody {
 	for _, sphere := range body.BoundingSpheres() {
 		sphere.Position = sphere.Position.Add(shift)
 	}
-    return body
+	return body
 }

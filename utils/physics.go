@@ -50,15 +50,13 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
 					col := physics.DetectInterParticleCollision(particleA, particleB)
 					if col.Magnitude > 0 {
                         mag := go_world.Pow32(1 + col.Magnitude, 4) - 1
-                        //if !bodyA.Static() {
-                        if true {
+                        if !bodyA.Static() {
                             springForce := col.Direction.Mul( -K * -mag  - B * particleA.Velocity().Dot(col.Direction))
                             particleA.ApplyForce(springForce)
                             friction := particleB.Velocity().Mul(-FRICTION)
                             particleB.ApplyForce(friction)
                         }
-                        //if !bodyB.Static() {
-                        if true {
+                        if !bodyB.Static() {
                             springForce := col.Direction.Mul( -K * mag  - B * particleB.Velocity().Dot(col.Direction))
                             particleB.ApplyForce(springForce)
                             friction := particleB.Velocity().Mul(-FRICTION)
@@ -74,11 +72,11 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
 func detectCollision(bodyA, bodyB physics.PhysicalBody, particleA, particleB *physics.MassParticle) physics.Collision {
 	posA := mgl32.TransformCoordinate(
 		particleA.Position(),
-		bodyA.Object().TransformationMatrix(),
+		go_world.Mat4To32(bodyA.Object().TransformationMatrix()),
 	)
 	posB := mgl32.TransformCoordinate(
 		particleB.Position(),
-		bodyB.Object().TransformationMatrix(),
+		go_world.Mat4To32(bodyB.Object().TransformationMatrix()),
 	)
 	return physics.CircleCollision(
 		posA,

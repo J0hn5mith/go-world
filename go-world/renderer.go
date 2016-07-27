@@ -53,26 +53,15 @@ func (renderer *Renderer) render(scene *Scene) {
 		)
         r, g, b := Vec3To32(object.Geometry().Color()).Elem()
 		gl.Uniform3f(uniColor, r, g, b)
-			//object.geometry.color[0],
-			//object.geometry.color[1],
-			//object.geometry.color[2],
 		renderer.renderObject(object)
 	}
 }
 
 func (r *Renderer) renderObject(object *Object) {
 	mat := mgl32.Ident4()
-	trans := mgl32.Translate3D(
-		object.position[0],
-		object.position[1],
-		object.position[2],
-	)
-	scale := mgl32.Scale3D(
-		object.scale[0],
-		object.scale[1],
-		object.scale[2],
-	)
-	mat = mat.Mul4(scale).Mul4(trans).Mul4(object.rotation)
+	trans := mgl32.Translate3D( Vec3To32(object.Position()).Elem())
+	scale := mgl32.Scale3D( Vec3To32(object.Scale()).Elem())
+	mat = mat.Mul4(scale).Mul4(trans).Mul4(Mat4To32(object.Rotation()))
 	modelUniform := gl.GetUniformLocation(
 		r.camera.program,
 		gl.Str("model\x00"),
@@ -91,37 +80,3 @@ type DebugRenderer interface {
 	Renderer() *Renderer
 	Render(world *World)
 }
-
-//func (r *Renderer) debugRenderSoftBodies(softBodies []*SoftBody) {
-//particleGeometry := createCircleGeometry(100, 0.05).Load(r.camera.program)
-//for _, softBody := range softBodies {
-//positionBody := softBody.Position()
-//translationBody := mgl32.Translate3D(
-//positionBody.X(),
-//positionBody.Y(),
-//positionBody.Z(),
-//)
-//for _, particle := range softBody.GetMassParticles() {
-//position := particle.Position()
-//trans := mgl32.Translate3D(
-//position.X(),
-//position.Y(),
-//position.Z(),
-//)
-//mat := mgl32.Ident4()
-//mat = mat.Mul4(translationBody).Mul4(trans)
-//modelUniform := gl.GetUniformLocation(
-//r.camera.program,
-//gl.Str("model\x00"),
-//)
-//gl.UniformMatrix4fv(modelUniform, 1, false, &mat[0])
-
-//gl.BindVertexArray(particleGeometry.vao)
-//gl.DrawArrays(
-//particleGeometry.DrawMethod(),
-//0,
-//int32(len(particleGeometry.Vertices())),
-//)
-//}
-//}
-//}
