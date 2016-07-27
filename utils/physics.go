@@ -7,9 +7,9 @@ import (
 )
 
 var G float32 = 9.81
-var K float32 = 250
-var B float32 = 1.241
-var FRICTION float32 = 0.10
+var K float32 = 65
+var B float32 = 1.141
+var FRICTION float32 = 0.1
 
 /*
 Default implementations for the physics stuff
@@ -18,7 +18,7 @@ Default implementations for the physics stuff
 type GravityForceField struct{}
 
 func (forceField *GravityForceField) Apply(body physics.PhysicalBody, time_delta float32) {
-    body.ApplyForce( mgl32.Vec3{0, -G*time_delta, 0,})
+    body.ApplyForce( mgl32.Vec3{0, -G*time_delta*2, 0,})
 }
 
 func CreateGravityForceField() *GravityForceField {
@@ -49,15 +49,16 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
 				for _, particleB := range bodyB.MassParticles() {
 					col := physics.DetectInterParticleCollision(particleA, particleB)
 					if col.Magnitude > 0 {
-                        //mag := go_world.Pow32(1 + col.Magnitude, 2) - 1
-                        mag := go_world.Pow32(1 + col.Magnitude, 5) - 1
-                        if !bodyA.Static() {
+                        mag := go_world.Pow32(1 + col.Magnitude, 4) - 1
+                        //if !bodyA.Static() {
+                        if true {
                             springForce := col.Direction.Mul( -K * -mag  - B * particleA.Velocity().Dot(col.Direction))
                             particleA.ApplyForce(springForce)
                             friction := particleB.Velocity().Mul(-FRICTION)
                             particleB.ApplyForce(friction)
                         }
-                        if !bodyB.Static() {
+                        //if !bodyB.Static() {
+                        if true {
                             springForce := col.Direction.Mul( -K * mag  - B * particleB.Velocity().Dot(col.Direction))
                             particleB.ApplyForce(springForce)
                             friction := particleB.Velocity().Mul(-FRICTION)
@@ -94,5 +95,6 @@ func calculateNewVelocity(body1, body2 physics.PhysicalBody, collision physics.C
 	a := k.Mul(2).Dot(body1.Velocity().Sub(body2.Velocity())) * (1 / (1/body1.Mass() + 1/body2.Mass()))
 	p1_vel := body1.Velocity().Sub(k.Mul(a / body1.Mass()))
 	p2_vel := body2.Velocity().Add(k.Mul(a / body2.Mass()))
+
 	return p1_vel, p2_vel
 }

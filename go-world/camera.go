@@ -37,7 +37,7 @@ func (camera *Camera) updateViewMatrix() {
 		mgl32.DegToRad(45.0),
 		camera.ratio,
 		0.1,
-		100.0,
+		300.0,
 	)
 	projectionUniform := gl.GetUniformLocation(
 		camera.program,
@@ -46,7 +46,7 @@ func (camera *Camera) updateViewMatrix() {
 	gl.UniformMatrix4fv(projectionUniform, 1, false, &projectionMatrix[0])
     viewMatrix := mgl32.LookAtV(
         camera.position,
-        mgl32.Vec3{0, 0, 0},
+        mgl32.Vec3{0, 3, 0},
         mgl32.Vec3{0, 1, 0},
     )
     cameraUniform := gl.GetUniformLocation(

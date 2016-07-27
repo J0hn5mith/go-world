@@ -43,7 +43,7 @@ type Physics struct {
 
 func NewPhysics() *Physics {
 	physics := new(Physics)
-	physics.airResistance = 0.50
+	physics.airResistance = 0.9
 	return physics
 }
 
@@ -188,9 +188,12 @@ func (physics *Physics) applyForceFields(timeDelta float32) {
 //TODO: Could this iteratoin be done using functional programming? Since I use
 //it twice
 func (physics *Physics) applyAirResistance(timeDelta float32) {
-	for _, rigidBody := range physics.bodies {
-		rigidBody.velocity = rigidBody.velocity.Mul(physics.airResistance)
-	}
+	//for _, rigidBody := range physics.bodies {
+        //for _, particle := range rigidBody.MassParticles(){
+            //mag  := (1 - 1/((1 + particle.Velocity().Len())*(1 + particle.Velocity().Len())) 
+			//particle.SetVelocity(particle.Velocity().Mul(mag * physics.airResistance))
+        //}
+	//}
 }
 
 func (physics *Physics) applySpringForces(timeDelta float32) {
