@@ -32,7 +32,7 @@ func StartWorld(window *glfw.Window) (*Renderer, *World) {
 	gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
 
 	width, height := window.GetSize()
-	camera := NewCamera(program, width, height)
+	camera := NewCamera(program, float64(width), float64(height))
 	scene := NewScene(program)
 	renderer := NewRenderer(camera)
 
