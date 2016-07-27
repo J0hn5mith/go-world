@@ -1,26 +1,26 @@
 package go_world_physics
 
 import (
-	"github.com/go-gl/mathgl/mgl32"
-	"go-world/go-world"
+	mgl "github.com/go-gl/mathgl/mgl64"
+    "math"
 )
 
 type MassParticle struct {
-	position    mgl32.Vec3 // Position relative to the center of mass
-	velocity    mgl32.Vec3
-	radius      float32
+	position    mgl.Vec3 // Position relative to the center of mass
+	velocity    mgl.Vec3
+	radius      float64
 	collided    bool
 	springs     []*Spring
-	springForce mgl32.Vec3
+	springForce mgl.Vec3
 }
 
 /*
 Creates a new mass particles.
 */
-func CreateMassParticle(x, y, z, radius float32) *MassParticle {
+func CreateMassParticle(x, y, z, radius float64) *MassParticle {
 	massParticle := new(MassParticle)
-	massParticle.position = mgl32.Vec3{x, y, z}
-	massParticle.velocity = mgl32.Vec3{0, 0, 0}
+	massParticle.position = mgl.Vec3{x, y, z}
+	massParticle.velocity = mgl.Vec3{0, 0, 0}
 	massParticle.radius = radius
 	massParticle.collided = false
 
@@ -30,14 +30,14 @@ func CreateMassParticle(x, y, z, radius float32) *MassParticle {
 /*
 Returns the position of the mass particle.
 */
-func (massParticle *MassParticle) Position() mgl32.Vec3 {
+func (massParticle *MassParticle) Position() mgl.Vec3 {
 	return massParticle.position
 }
 
 /*
 Sets the position of the mass particle.
 */
-func (massParticle *MassParticle) SetPosition(position mgl32.Vec3) *MassParticle {
+func (massParticle *MassParticle) SetPosition(position mgl.Vec3) *MassParticle {
 	massParticle.position = position
 	return massParticle
 }
@@ -45,7 +45,7 @@ func (massParticle *MassParticle) SetPosition(position mgl32.Vec3) *MassParticle
 /*
 Shifts the position of the particle by provided values.
 */
-func (massParticle *MassParticle) ShiftPosition(shift mgl32.Vec3) *MassParticle {
+func (massParticle *MassParticle) ShiftPosition(shift mgl.Vec3) *MassParticle {
 	massParticle.SetPosition(massParticle.Position().Add(shift))
 	return massParticle
 }
@@ -53,14 +53,14 @@ func (massParticle *MassParticle) ShiftPosition(shift mgl32.Vec3) *MassParticle 
 /*
 Returns the radius of the partilce.
 */
-func (massParticle *MassParticle) Radius() float32 {
+func (massParticle *MassParticle) Radius() float64 {
 	return massParticle.radius
 }
 
 /*
 Returns the position of the particle.
 */
-func (massParticle *MassParticle) Velocity() mgl32.Vec3 {
+func (massParticle *MassParticle) Velocity() mgl.Vec3 {
 	return massParticle.velocity
 }
 
@@ -73,7 +73,7 @@ func (massParticle *MassParticle) SetCollided(collided bool) *MassParticle {
 	return massParticle
 }
 
-func (massParticle *MassParticle) SetVelocity(velocity mgl32.Vec3) *MassParticle {
+func (massParticle *MassParticle) SetVelocity(velocity mgl.Vec3) *MassParticle {
 	massParticle.velocity = velocity
 	return massParticle
 }
@@ -87,21 +87,21 @@ func (massParticle *MassParticle) Springs() []*Spring {
 	return massParticle.springs
 }
 
-func (massParticle *MassParticle) GetSpringForce() mgl32.Vec3 {
+func (massParticle *MassParticle) GetSpringForce() mgl.Vec3 {
 	return massParticle.springForce
 }
 
-func (massParticle *MassParticle) SetSpringForce(x, y, z float32) *MassParticle {
-	massParticle.springForce = mgl32.Vec3{x, y, z}
+func (massParticle *MassParticle) SetSpringForce(x, y, z float64) *MassParticle {
+	massParticle.springForce = mgl.Vec3{x, y, z}
 	return massParticle
 }
 
-func (massParticle *MassParticle) ApplySpringForce(force mgl32.Vec3) *MassParticle {
+func (massParticle *MassParticle) ApplySpringForce(force mgl.Vec3) *MassParticle {
 	massParticle.springForce = massParticle.springForce.Add(force)
 	return massParticle
 }
 
-func (massParticle *MassParticle) ApplyForce(force mgl32.Vec3) *MassParticle {
+func (massParticle *MassParticle) ApplyForce(force mgl.Vec3) *MassParticle {
 	v := massParticle.Velocity().Add(force)
 	massParticle.SetVelocity(v)
 	return massParticle
@@ -110,12 +110,12 @@ func (massParticle *MassParticle) ApplyForce(force mgl32.Vec3) *MassParticle {
 type Spring struct {
 	source         *MassParticle
 	target         *MassParticle
-	length         float32
-	springConstant float32
-	damperConstant float32
+	length         float64
+	springConstant float64
+	damperConstant float64
 }
 
-func SpringFromMassParticles(particle1, particle2 *MassParticle, springConstant, damperConstant float32) *Spring {
+func SpringFromMassParticles(particle1, particle2 *MassParticle, springConstant, damperConstant float64) *Spring {
 	spring := new(Spring)
 	spring.source = particle1
 	spring.target = particle2
@@ -143,7 +143,7 @@ func (spring *Spring) Apply() {
 /*
 Creates mass particles for a box object
 */
-func AddMassParticle2D(body PhysicalBody, x, y, diameter float32) {
+func AddMassParticle2D(body PhysicalBody, x, y, diameter float64) {
 	radius := diameter / 2
 	lenX := int(x / diameter)
 	lenY := int(y / diameter)
@@ -155,8 +155,8 @@ func AddMassParticle2D(body PhysicalBody, x, y, diameter float32) {
 	for x := 0; x < lenX; x++ {
 		for y := 0; y < lenY; y++ {
 			if (x == 0 || x == lenX-1) && (y == 0 || y == lenY-1) {
-				xPos := -offsetX + radius + float32(x)*diameter + op.X()
-				yPos := -offsetY + radius + float32(y)*diameter + op.Y()
+				xPos := -offsetX + radius + float64(x)*diameter + op.X()
+				yPos := -offsetY + radius + float64(y)*diameter + op.Y()
 				radiusHalf := radius / 2
 				body.AddMassParticle(CreateMassParticle(xPos-radiusHalf, yPos-radiusHalf, 0, radiusHalf))
 				body.AddMassParticle(CreateMassParticle(xPos+radiusHalf, yPos-radiusHalf, 0, radiusHalf))
@@ -164,13 +164,13 @@ func AddMassParticle2D(body PhysicalBody, x, y, diameter float32) {
 				body.AddMassParticle(CreateMassParticle(xPos-radiusHalf, yPos+radiusHalf, 0, radiusHalf))
 
 			} else {
-				xPos := -offsetX + radius + float32(x)*diameter + op.X()
-				yPos := -offsetY + radius + float32(y)*diameter + op.Y()
+				xPos := -offsetX + radius + float64(x)*diameter + op.X()
+				yPos := -offsetY + radius + float64(y)*diameter + op.Y()
 				body.AddMassParticle(CreateMassParticle(xPos, yPos, 0, radius))
 				if x == 0 || x == lenX-1 {
 					if y != lenY-1 {
-						xPos := -offsetX + radius + float32(x)*diameter + op.X()
-						yPos := -offsetY + 2*radius + float32(y)*diameter + op.Y()
+						xPos := -offsetX + radius + float64(x)*diameter + op.X()
+						yPos := -offsetY + 2*radius + float64(y)*diameter + op.Y()
 						body.AddMassParticle(
 							CreateMassParticle(xPos, yPos, 0, radius),
 						)
@@ -178,8 +178,8 @@ func AddMassParticle2D(body PhysicalBody, x, y, diameter float32) {
 				}
 				if y == 0 || y == lenY-1 {
 					if x != lenX-1 {
-						xPos := -offsetX + 2*radius + float32(x)*diameter + op.X()
-						yPos := -offsetY + radius + float32(y)*diameter + op.Y()
+						xPos := -offsetX + 2*radius + float64(x)*diameter + op.X()
+						yPos := -offsetY + radius + float64(y)*diameter + op.Y()
 						body.AddMassParticle(
 							CreateMassParticle(xPos, yPos, 0, radius),
 						)
@@ -188,21 +188,21 @@ func AddMassParticle2D(body PhysicalBody, x, y, diameter float32) {
 			}
 		}
 	}
-	bsRadius := go_world.Sqrt32(
-		go_world.Pow32((x/2), 2) + go_world.Pow32(y/2, 2),
+	bsRadius := math.Sqrt(
+		math.Pow((x/2), 2) + math.Pow(y/2, 2),
 	)
-	body.AddBoundingSphere(&Sphere{mgl32.Vec3{0, 0, 0}, bsRadius})
+	body.AddBoundingSphere(&Sphere{mgl.Vec3{0, 0, 0}, bsRadius})
 }
 
-func (tree *SphereTree) CreateSphereTree(rectangle Rectangle, sphereRadius float32) *SphereTree {
+func (tree *SphereTree) CreateSphereTree(rectangle Rectangle, sphereRadius float64) *SphereTree {
 	tree.root = tree.decomposeRectangle(rectangle, sphereRadius)
 	return tree
 }
 
-func (tree *SphereTree) decomposeRectangle(rectangle Rectangle, sphereRadius float32) *SphereTreeNode {
-	radius := go_world.Sqrt32(
-		go_world.Pow32((rectangle.Dimension.X()/2), 2) +
-			go_world.Pow32(rectangle.Dimension.Y()/2, 2),
+func (tree *SphereTree) decomposeRectangle(rectangle Rectangle, sphereRadius float64) *SphereTreeNode {
+	radius := math.Sqrt(
+		math.Pow((rectangle.Dimension.X()/2), 2) +
+			math.Pow(rectangle.Dimension.Y()/2, 2),
 	)
 
 	if radius < sphereRadius {
@@ -214,11 +214,11 @@ func (tree *SphereTree) decomposeRectangle(rectangle Rectangle, sphereRadius flo
 		return &node
 	}
 
-	var shift mgl32.Vec3
+	var shift mgl.Vec3
 	if rectangle.Dimension.X()/rectangle.Dimension.Y() < 0.5 { // Horizontal Splitting
-		shift = mgl32.Vec3{0, rectangle.Dimension.Y() / 2, 0}
+		shift = mgl.Vec3{0, rectangle.Dimension.Y() / 2, 0}
 	} else {
-		shift = mgl32.Vec3{rectangle.Dimension.X() / 2, 0, 0}
+		shift = mgl.Vec3{rectangle.Dimension.X() / 2, 0, 0}
 	}
 	newSize := rectangle.Dimension.Sub(shift.Mul(2))
 	positionA := rectangle.Position.Sub(shift)

@@ -22,13 +22,9 @@ func NewCamera(program uint32, windowWidth, windowHeight float64) *Camera {
 	return camera
 }
 
-func (camera *Camera) SetPosition(x, y, z float32) *Camera {
-	camera.position = mgl.Vec3{
-        float64(x),
-        float64(y),
-        float64(z),
-    }
-	camera.updateViewMatrix()
+func (camera *Camera) SetPosition(position mgl.Vec3) *Camera {
+	camera.position = position
+    camera.updateViewMatrix()
 	return camera
 }
 

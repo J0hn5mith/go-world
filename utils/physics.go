@@ -1,15 +1,15 @@
 package go_world_utils
 
 import (
-	"github.com/go-gl/mathgl/mgl32"
+	mgl "github.com/go-gl/mathgl/mgl64"
 	physics "go-world/physics"
-	"go-world/go-world"
+    "math"
 )
 
-var G float32 = 9.81
-var K float32 = 65
-var B float32 = 1.141
-var FRICTION float32 = 0.1
+var G float64 = 9.81
+var K float64 = 65
+var B float64 = 1.141
+var FRICTION float64 = 0.1
 
 /*
 Default implementations for the physics stuff
@@ -17,8 +17,8 @@ Default implementations for the physics stuff
 
 type GravityForceField struct{}
 
-func (forceField *GravityForceField) Apply(body physics.PhysicalBody, time_delta float32) {
-    body.ApplyForce( mgl32.Vec3{0, -G*time_delta*2, 0,})
+func (forceField *GravityForceField) Apply(body physics.PhysicalBody, timeDelta float64) {
+    body.ApplyForce(mgl.Vec3{0, -G*timeDelta*2.0, 0.0})
 }
 
 func CreateGravityForceField() *GravityForceField {
@@ -49,7 +49,7 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
 				for _, particleB := range bodyB.MassParticles() {
 					col := physics.DetectInterParticleCollision(particleA, particleB)
 					if col.Magnitude > 0 {
-                        mag := go_world.Pow32(1 + col.Magnitude, 4) - 1
+                        mag := math.Pow(1 + col.Magnitude, 4) - 1
                         if !bodyA.Static() {
                             springForce := col.Direction.Mul( -K * -mag  - B * particleA.Velocity().Dot(col.Direction))
                             particleA.ApplyForce(springForce)
@@ -70,13 +70,13 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
 }
 
 func detectCollision(bodyA, bodyB physics.PhysicalBody, particleA, particleB *physics.MassParticle) physics.Collision {
-	posA := mgl32.TransformCoordinate(
+	posA := mgl.TransformCoordinate(
 		particleA.Position(),
-		go_world.Mat4To32(bodyA.Object().TransformationMatrix()),
+		bodyA.Object().TransformationMatrix(),
 	)
-	posB := mgl32.TransformCoordinate(
+	posB := mgl.TransformCoordinate(
 		particleB.Position(),
-		go_world.Mat4To32(bodyB.Object().TransformationMatrix()),
+		bodyB.Object().TransformationMatrix(),
 	)
 	return physics.CircleCollision(
 		posA,
@@ -86,7 +86,7 @@ func detectCollision(bodyA, bodyB physics.PhysicalBody, particleA, particleB *ph
 	)
 }
 
-func calculateNewVelocity(body1, body2 physics.PhysicalBody, collision physics.Collision) (mgl32.Vec3, mgl32.Vec3) {
+func calculateNewVelocity(body1, body2 physics.PhysicalBody, collision physics.Collision) (mgl.Vec3, mgl.Vec3) {
 	k := (body1.Position().
 		Sub(body2.Position())).
 		Mul(1 / (body1.Position().Sub(body2.Position()).Len()))

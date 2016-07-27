@@ -27,7 +27,7 @@ func (debugRenderer *MassParticleDebugRenderer) Render(world *go_world.World) {
 	bodies := debugRenderer.physics.Bodies()
 	renderer := debugRenderer.Renderer()
 	for _, body := range bodies {
-        renderParticles(renderer, body)
+		renderParticles(renderer, body)
 		renderBoundingSpheres(renderer, body)
 	}
 }
@@ -36,11 +36,7 @@ func renderParticles(renderer *go_world.Renderer, body physics.PhysicalBody) {
 	particleGeometry := createCircleGeometry(100, body.MassParticles()[0].Radius()).Load(renderer.Camera().Program())
 	for _, particle := range body.MassParticles() {
 		position := particle.Position()
-		trans := mgl32.Translate3D(
-			position.X(),
-			position.Y(),
-			position.Z(),
-		)
+		trans := mgl32.Translate3D(go_world.Vec3To32(position).Elem())
 		mat := mgl32.Ident4()
 		mat = mat.Mul4(trans)
 		modelUniform := gl.GetUniformLocation(
@@ -56,18 +52,14 @@ func renderParticles(renderer *go_world.Renderer, body physics.PhysicalBody) {
 			int32(len(particleGeometry.Vertices())-1),
 		)
 	}
-    particleGeometry.Delete()
+	particleGeometry.Delete()
 }
 
 func renderBoundingSpheres(renderer *go_world.Renderer, body physics.PhysicalBody) {
 	for _, sphere := range body.BoundingSpheres() {
 		position := sphere.Position
 		particleGeometry := createCircleLineGeometry(100, sphere.Radius).Load(renderer.Camera().Program())
-		trans := mgl32.Translate3D(
-			position.X(),
-			position.Y(),
-			position.Z(),
-		)
+		trans := mgl32.Translate3D(go_world.Vec3To32(position).Elem())
 		mat := mgl32.Ident4()
 		mat = mat.Mul4(trans)
 		modelUniform := gl.GetUniformLocation(
@@ -82,6 +74,6 @@ func renderBoundingSpheres(renderer *go_world.Renderer, body physics.PhysicalBod
 			0,
 			int32(len(particleGeometry.Vertices())-1),
 		)
-        particleGeometry.Delete()
+		particleGeometry.Delete()
 	}
 }

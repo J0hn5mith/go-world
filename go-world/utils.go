@@ -95,3 +95,19 @@ func Vec3To64(vector mgl32.Vec3) mgl64.Vec3 {
 		float64(vector.Z()),
 	}
 }
+
+func ToFloat64Array(values32 []float32) []float64 {
+	var values64 []float64
+	for _, value := range values32 {
+		values64 = append(values64, float64(value))
+	}
+	return values64
+}
+
+func ToFloat32Array(values64 []float64) []float32 {
+	var values32 []float32
+	for _, value := range values64 {
+		values32 = append(values32, float32(value))
+	}
+	return values32
+}

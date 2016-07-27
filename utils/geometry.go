@@ -2,7 +2,7 @@ package go_world_utils
 
 import (
 	"github.com/go-gl/gl/v4.1-core/gl"
-	"github.com/go-gl/mathgl/mgl32"
+	mgl "github.com/go-gl/mathgl/mgl64"
 	"go-world/go-world"
 	"math"
 )
@@ -10,23 +10,23 @@ import (
 /*
 Geometry Creators
 */
-func CreateBoxGeometry(x, y, z float32) *go_world.Geometry {
+func CreateBoxGeometry(x, y, z float64) *go_world.Geometry {
 	return createBoxGeometry(x, y, z)
 }
 
-func CreateWireBoxGeometry(width, height, depth float32) *go_world.Geometry {
+func CreateWireBoxGeometry(width, height, depth float64) *go_world.Geometry {
 	vertices := CreateWireBoxVertices(width, height, depth)
 	geometry := go_world.NewGeometry(vertices)
 	geometry.SetDrawMethod(gl.LINES)
 	return geometry
 }
 
-func CreateCubeGeometry(sideLength float32) *go_world.Geometry {
+func CreateCubeGeometry(sideLength float64) *go_world.Geometry {
 	return createCubeGeometry(sideLength)
 }
 
-func CreateLineGeometry(start, end mgl32.Vec3) *go_world.Geometry {
-	var vertices = []float32{
+func CreateLineGeometry(start, end mgl.Vec3) *go_world.Geometry {
+	var vertices = []float64{
 		start.X(), start.Y(), start.Z(),
 		end.X(), end.Y(), end.Z(),
 	}
@@ -36,8 +36,8 @@ func CreateLineGeometry(start, end mgl32.Vec3) *go_world.Geometry {
 	return geometry
 }
 
-func CreateLineLoopGeometry(points ...mgl32.Vec3) *go_world.Geometry {
-	vertices := []float32{}
+func CreateLineLoopGeometry(points ...mgl.Vec3) *go_world.Geometry {
+	vertices := []float64{}
 	for i, point := range points {
 		pn := points[(i+1)%len(points)]
 		vertices = append(vertices, point.X(), point.Y(), point.Z(), pn.X(), pn.Y(), pn.Z())
@@ -48,16 +48,16 @@ func CreateLineLoopGeometry(points ...mgl32.Vec3) *go_world.Geometry {
 	return geometry
 }
 
-func CreateCircleLineGeometry(num_vertices int, radius float32) *go_world.Geometry {
+func CreateCircleLineGeometry(num_vertices int, radius float64) *go_world.Geometry {
 	return CreateCircleLineGeometry(num_vertices, radius)
 }
-func CreateCircleGeometry(num_vertices int, radius float32) *go_world.Geometry {
+func CreateCircleGeometry(num_vertices int, radius float64) *go_world.Geometry {
 	return createCircleGeometry(num_vertices, radius)
 }
 
-func CreatePlaneGeometry(sideLength float32) *go_world.Geometry {
+func CreatePlaneGeometry(sideLength float64) *go_world.Geometry {
 	halfSideLength := sideLength / 2.0
-	geometry := go_world.NewGeometry([]float32{
+	geometry := go_world.NewGeometry([]float64{
 		-halfSideLength, 0, halfSideLength,
 		halfSideLength, 0, halfSideLength,
 		-halfSideLength, 0, -halfSideLength,
@@ -68,12 +68,12 @@ func CreatePlaneGeometry(sideLength float32) *go_world.Geometry {
 	return geometry
 }
 
-func createSphereGeometry(radius float32, rings, sectors float64) *go_world.Geometry {
+func createSphereGeometry(radius float64, rings, sectors float64) *go_world.Geometry {
 	var R float64 = float64(1.0 / (rings - 1))
 	var S float64 = float64(1.0 / (sectors - 1))
 
 	num_vertices := uint32(rings * sectors * 3)
-	vertices := make([]float32, num_vertices)
+	vertices := make([]float64, num_vertices)
 
 	var r, s float64
 	var x, y, z float64
@@ -85,11 +85,11 @@ func createSphereGeometry(radius float32, rings, sectors float64) *go_world.Geom
 			x = math.Cos(2.0*math.Pi*s*S) * math.Sin(math.Pi*r*R)
 			z = math.Sin(2.0*math.Pi*s*S) * math.Sin(math.Pi*r*R)
 
-			vertices[i] = float32(x)
+			vertices[i] = float64(x)
 			i += 1
-			vertices[i] = float32(y)
+			vertices[i] = float64(y)
 			i += 1
-			vertices[i] = float32(z)
+			vertices[i] = float64(z)
 			i += 1
 		}
 	}
@@ -98,8 +98,8 @@ func createSphereGeometry(radius float32, rings, sectors float64) *go_world.Geom
 	return geometry
 }
 
-func createDiamondGeometry(side_length float32) *go_world.Geometry {
-	var vertices = []float32{
+func createDiamondGeometry(side_length float64) *go_world.Geometry {
+	var vertices = []float64{
 		0.5, 0.0, 0.0,
 		0.0, 0.5, 0.0,
 
@@ -116,9 +116,9 @@ func createDiamondGeometry(side_length float32) *go_world.Geometry {
 	return geometry
 }
 
-func createTriangle2DGeometry(side_length float32) *go_world.Geometry {
+func createTriangle2DGeometry(side_length float64) *go_world.Geometry {
 	side_length = side_length
-	var vertices = []float32{
+	var vertices = []float64{
 		-side_length / 2.0, -side_length / 2, 0.0,
 		side_length / 2.0, -side_length / 2, 0.0,
 		0, side_length / 2.0, 0.0,
@@ -128,19 +128,19 @@ func createTriangle2DGeometry(side_length float32) *go_world.Geometry {
 	return geometry
 }
 
-func createCubeGeometry(sideLength float32) *go_world.Geometry {
+func createCubeGeometry(sideLength float64) *go_world.Geometry {
 	return createBoxGeometry(sideLength, sideLength, sideLength)
 }
 
-func createBoxGeometry(width, height, depth float32) *go_world.Geometry {
+func createBoxGeometry(width, height, depth float64) *go_world.Geometry {
 	vertices := CreateBoxVertices(width, height, depth)
 	geometry := go_world.NewGeometry(vertices)
 	geometry.SetDrawMethod(gl.TRIANGLES)
 	return geometry
 }
 
-func createCircleLineGeometry(num_vertices int, radius float32) *go_world.Geometry {
-	vertices := []float32{}
+func createCircleLineGeometry(num_vertices int, radius float64) *go_world.Geometry {
+	vertices := []float64{}
 
 	px, py := angleToCoords(0)
 
@@ -149,8 +149,8 @@ func createCircleLineGeometry(num_vertices int, radius float32) *go_world.Geomet
 		x, y := angleToCoords(angle)
 		vertices = append(
 			vertices,
-			float32(x)*radius, float32(y)*radius, 0.0,
-			float32(px)*radius, float32(py)*radius, 0.0,
+			float64(x)*radius, float64(y)*radius, 0.0,
+			float64(px)*radius, float64(py)*radius, 0.0,
 		)
 		px = x
 		py = y
@@ -159,8 +159,8 @@ func createCircleLineGeometry(num_vertices int, radius float32) *go_world.Geomet
 	x, y := angleToCoords(0)
 	vertices = append(
 		vertices,
-		float32(x)*radius, float32(y)*radius, 0.0,
-		float32(px)*radius, float32(py)*radius, 0.0,
+		float64(x)*radius, float64(y)*radius, 0.0,
+		float64(px)*radius, float64(py)*radius, 0.0,
 	)
 
 	geometry := go_world.NewGeometry(vertices)
@@ -168,8 +168,8 @@ func createCircleLineGeometry(num_vertices int, radius float32) *go_world.Geomet
 	return geometry
 }
 
-func createCircleGeometry(num_vertices int, radius float32) *go_world.Geometry {
-	vertices := []float32{}
+func createCircleGeometry(num_vertices int, radius float64) *go_world.Geometry {
+	vertices := []float64{}
 
 	px, py := angleToCoords(0)
 
@@ -179,8 +179,8 @@ func createCircleGeometry(num_vertices int, radius float32) *go_world.Geometry {
 		vertices = append(
 			vertices,
 			0, 0, 0,
-			float32(x)*radius, float32(y)*radius, 0.0,
-			float32(px)*radius, float32(py)*radius, 0.0,
+			float64(x)*radius, float64(y)*radius, 0.0,
+			float64(px)*radius, float64(py)*radius, 0.0,
 		)
 		px = x
 		py = y
@@ -190,8 +190,8 @@ func createCircleGeometry(num_vertices int, radius float32) *go_world.Geometry {
 	vertices = append(
 		vertices,
 		0, 0, 0,
-		float32(x)*radius, float32(y)*radius, 0.0,
-		float32(px)*radius, float32(py)*radius, 0.0,
+		float64(x)*radius, float64(y)*radius, 0.0,
+		float64(px)*radius, float64(py)*radius, 0.0,
 	)
 
 	geometry := go_world.NewGeometry(vertices)
@@ -206,12 +206,12 @@ func angleToCoords(angle float64) (float64, float64) {
 }
 
 func createOctahedronGeometry() *go_world.Geometry {
-	p0 := mgl32.Vec3{0, 1, 0}
-	p1 := mgl32.Vec3{-1, 0, 1}
-	p2 := mgl32.Vec3{1, 0, 1}
-	p3 := mgl32.Vec3{1, 0, -1}
-	p4 := mgl32.Vec3{-1, 0, -1}
-	p5 := mgl32.Vec3{0, -1, 0}
+	p0 := mgl.Vec3{0, 1, 0}
+	p1 := mgl.Vec3{-1, 0, 1}
+	p2 := mgl.Vec3{1, 0, 1}
+	p3 := mgl.Vec3{1, 0, -1}
+	p4 := mgl.Vec3{-1, 0, -1}
+	p5 := mgl.Vec3{0, -1, 0}
 
 	t1 := Triangle{p1, p2, p0}
 	t2 := Triangle{p2, p3, p0}
@@ -229,12 +229,12 @@ func createOctahedronGeometry() *go_world.Geometry {
 /*
 Vertex Creators
 */
-func CreateBoxVertices(width, height, depth float32) []float32 {
+func CreateBoxVertices(width, height, depth float64) []float64 {
 	xOffset := width / 2
 	yOffset := height / 2
 	zOffset := depth / 2
 
-	var vertices = []float32{
+	var vertices = []float64{
 		// Bottom
 		-xOffset, -yOffset, -zOffset,
 		xOffset, -yOffset, -zOffset,
@@ -285,11 +285,11 @@ func CreateBoxVertices(width, height, depth float32) []float32 {
 	}
 	return vertices
 }
-func CreateWireBoxVertices(width, height, depth float32) []float32 {
+func CreateWireBoxVertices(width, height, depth float64) []float64 {
 	width = width / 2
 	height = height / 2
 	depth = depth / 2
-	var vertices = []float32{
+	var vertices = []float64{
 		//Front
 		-width, -height, depth,
 		width, -height, depth,
@@ -332,8 +332,8 @@ func CreateWireBoxVertices(width, height, depth float32) []float32 {
 	return vertices
 }
 
-func to_array(vertices ...mgl32.Vec3) []float32 {
-	var array []float32
+func to_array(vertices ...mgl.Vec3) []float64 {
+	var array []float64
 	for _, v := range vertices {
 		array = append(array, v[0], v[1], v[2])
 	}
@@ -341,11 +341,11 @@ func to_array(vertices ...mgl32.Vec3) []float32 {
 }
 
 type Triangle struct {
-	v1, v2, v3 mgl32.Vec3
+	v1, v2, v3 mgl.Vec3
 }
 
-func t_to_array(triangles ...Triangle) []float32 {
-	var array []float32
+func t_to_array(triangles ...Triangle) []float64 {
+	var array []float64
 	for _, t := range triangles {
 		values := to_array(t.v1, t.v2, t.v3)
 		array = append(array, values...)

@@ -14,9 +14,9 @@ type Geometry struct {
 	vbo         uint32
 }
 
-func NewGeometry(vertices []float32) *Geometry {
+func NewGeometry(vertices []float64) *Geometry {
 	geometry := new(Geometry)
-	geometry.vertices = vertices
+	geometry.vertices = ToFloat32Array(vertices)
 	geometry.color = mgl.Vec3{0, 0, 0}
     geometry.program = 0
 	return geometry

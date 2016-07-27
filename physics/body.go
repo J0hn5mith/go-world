@@ -1,25 +1,25 @@
 package go_world_physics
 
 import (
-	"github.com/go-gl/mathgl/mgl32"
+	mgl "github.com/go-gl/mathgl/mgl64"
 	"go-world/go-world"
 )
 
 type RigidBody struct {
 	object          *go_world.Object
-	position        mgl32.Vec3
-	velocity        mgl32.Vec3
-	angularVelocity mgl32.Vec3
-	centerOfMass    mgl32.Vec3
+	position        mgl.Vec3
+	velocity        mgl.Vec3
+	angularVelocity mgl.Vec3
+	centerOfMass    mgl.Vec3
 	massParticles   []*MassParticle
-	mass            float32
+	mass            float64
 	static          bool
 	boundingSpheres []*Sphere
 }
 
 func NewRigidBody() *RigidBody {
 	body := new(RigidBody)
-	body.angularVelocity = mgl32.Vec3{0, 0, 0}
+	body.angularVelocity = mgl.Vec3{0, 0, 0}
 	return body
 }
 
@@ -34,15 +34,15 @@ func CreateStaticBody() *RigidBody {
 func CreateBody(static bool) *RigidBody {
 	body := new(RigidBody)
 	body.object = nil
-	body.position = mgl32.Vec3{0, 0, 0}
-	body.velocity = mgl32.Vec3{0, 0, 0}
+	body.position = mgl.Vec3{0, 0, 0}
+	body.velocity = mgl.Vec3{0, 0, 0}
 	body.mass = 1.0
 	body.static = static
 
 	return body
 }
 
-func (body *RigidBody) SetVelocity(velocity mgl32.Vec3) PhysicalBody {
+func (body *RigidBody) SetVelocity(velocity mgl.Vec3) PhysicalBody {
 	body.velocity = velocity
 	for _, particle := range body.MassParticles() {
 		particle.SetVelocity(velocity)
@@ -51,20 +51,20 @@ func (body *RigidBody) SetVelocity(velocity mgl32.Vec3) PhysicalBody {
 	return body
 }
 
-func (body *RigidBody) GetVelocity() mgl32.Vec3 {
+func (body *RigidBody) GetVelocity() mgl.Vec3 {
 	return body.velocity
 }
 
-func (body *RigidBody) Velocity() mgl32.Vec3 {
+func (body *RigidBody) Velocity() mgl.Vec3 {
 	return body.velocity
 }
 
-func (body *RigidBody) SetAngularVelocity(x, y, z float32) PhysicalBody {
-	body.angularVelocity = mgl32.Vec3{x, y, z}
+func (body *RigidBody) SetAngularVelocity(velocity mgl.Vec3) PhysicalBody {
+	body.angularVelocity = velocity
 	return body
 }
 
-func (body *RigidBody) AngularVelocity() mgl32.Vec3 {
+func (body *RigidBody) AngularVelocity() mgl.Vec3 {
 	return body.angularVelocity
 }
 
@@ -77,7 +77,7 @@ func (body *RigidBody) MassParticles() []*MassParticle {
 	return body.massParticles
 }
 
-func (body *RigidBody) ApplyForce(force mgl32.Vec3) PhysicalBody {
+func (body *RigidBody) ApplyForce(force mgl.Vec3) PhysicalBody {
 	for _, particle := range body.MassParticles() {
 		particle.ApplyForce(force)
 	}
@@ -88,10 +88,10 @@ func (body *RigidBody) Object() *go_world.Object {
 	return body.object
 }
 
-func (body *RigidBody) Mass() float32 {
+func (body *RigidBody) Mass() float64 {
 	return body.mass
 }
-func (body *RigidBody) SetMass(mass float32) PhysicalBody {
+func (body *RigidBody) SetMass(mass float64) PhysicalBody {
 	body.mass = mass
 	return body
 }
@@ -105,9 +105,9 @@ func (body *RigidBody) SetStatic(static bool) *RigidBody {
 	return body
 }
 
-func (body *RigidBody) SetPosition(position mgl32.Vec3) PhysicalBody {
+func (body *RigidBody) SetPosition(position mgl.Vec3) PhysicalBody {
 	if body.object != nil {
-		body.object.SetPosition(go_world.Vec3To64(position))
+		body.object.SetPosition(position)
 	}
 	shift := position.Sub(body.position)
 	for _, particle := range body.MassParticles() {
@@ -118,13 +118,13 @@ func (body *RigidBody) SetPosition(position mgl32.Vec3) PhysicalBody {
 	return body
 }
 
-func (body *RigidBody) Position() mgl32.Vec3 {
+func (body *RigidBody) Position() mgl.Vec3 {
 	return body.position
 }
 
-func (body *RigidBody) ShiftPosition(shift mgl32.Vec3) PhysicalBody {
+func (body *RigidBody) ShiftPosition(shift mgl.Vec3) PhysicalBody {
 	p := body.Position().Add(shift)
-	body.object.SetPosition(go_world.Vec3To64(p))//TODO
+	body.object.SetPosition(p)
 	return body
 }
 
@@ -137,7 +137,7 @@ func (body *RigidBody) AddBoundingSphere(boundingSphere *Sphere) *RigidBody {
 	return body
 }
 
-func (body *RigidBody) ShiftBoundingSpheres(shift mgl32.Vec3) *RigidBody {
+func (body *RigidBody) ShiftBoundingSpheres(shift mgl.Vec3) *RigidBody {
 	for _, sphere := range body.BoundingSpheres() {
 		sphere.Position = sphere.Position.Add(shift)
 	}
