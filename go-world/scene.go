@@ -3,7 +3,7 @@ package go_world
 import ()
 
 /*
-Pointer non pointer mess
+//Pointer non pointer mess
 */
 type Scene struct {
 	objects []*Object

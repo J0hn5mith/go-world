@@ -45,6 +45,13 @@ func StartWorld(window *glfw.Window) (*Renderer, *World) {
 	return renderer, world
 }
 
+func (world *World) Delete() *World {
+    for _, object := range world.Scene.Objects(){
+        object.Geometry().Delete()
+    }
+    return world
+}
+
 func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error) {
 	vertexShader, err := compileShader(vertexShaderSource, gl.VERTEX_SHADER)
 	if err != nil {
@@ -79,6 +86,7 @@ func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error)
 	return program, nil
 }
 
+
 func (w World) Program() uint32 {
 	return w.program
 }
@@ -95,3 +103,4 @@ func (w World) NewObject(geometry *Geometry) *Object {
 func (world *World) Update(timeDelta float32) *World {
     return world
 }
+

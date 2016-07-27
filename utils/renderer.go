@@ -56,6 +56,7 @@ func renderParticles(renderer *go_world.Renderer, body physics.PhysicalBody) {
 			int32(len(particleGeometry.Vertices())-1),
 		)
 	}
+    particleGeometry.Delete()
 }
 
 func renderBoundingSpheres(renderer *go_world.Renderer, body physics.PhysicalBody) {
@@ -81,5 +82,6 @@ func renderBoundingSpheres(renderer *go_world.Renderer, body physics.PhysicalBod
 			0,
 			int32(len(particleGeometry.Vertices())-1),
 		)
+        particleGeometry.Delete()
 	}
 }

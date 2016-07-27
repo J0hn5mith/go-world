@@ -81,7 +81,7 @@ func (r *Renderer) renderObject(object *Object) {
 
 	gl.BindVertexArray(object.geometry.vao)
 	gl.DrawArrays(
-		object.geometry.draw_method,
+		object.geometry.drawMethod,
 		0,
 		int32(len(object.geometry.vertices)),
 	)
