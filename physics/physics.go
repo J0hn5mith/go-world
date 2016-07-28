@@ -3,6 +3,7 @@ package go_world_physics
 import (
 	mgl "github.com/go-gl/mathgl/mgl64"
 	"go-world/go-world"
+    "fmt"
 )
 
 /*
@@ -164,6 +165,8 @@ func (physics *Physics) updatePosition(timeDelta float64) {
 func (physics *Physics) updatePositionBody(timeDelta float64, body PhysicalBody) {
 	for _, particle := range body.MassParticles() {
 		delta := particle.Velocity().Mul(timeDelta)
+        fmt.Println(particle.Velocity().Len())
+
 		particle.ShiftPosition(delta)
 	}
 }
