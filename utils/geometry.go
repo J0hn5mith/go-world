@@ -10,8 +10,8 @@ import (
 /*
 Geometry Creators
 */
-func CreateBoxGeometry(x, y, z float64) *go_world.Geometry {
-	return createBoxGeometry(x, y, z)
+func CreateBoxGeometry(dimension mgl.Vec3) *go_world.Geometry {
+	return createBoxGeometry(dimension)
 }
 
 func CreateWireBoxGeometry(width, height, depth float64) *go_world.Geometry {
@@ -129,11 +129,11 @@ func createTriangle2DGeometry(side_length float64) *go_world.Geometry {
 }
 
 func createCubeGeometry(sideLength float64) *go_world.Geometry {
-	return createBoxGeometry(sideLength, sideLength, sideLength)
+	return createBoxGeometry(mgl.Vec3{sideLength, sideLength, sideLength})
 }
 
-func createBoxGeometry(width, height, depth float64) *go_world.Geometry {
-	vertices := CreateBoxVertices(width, height, depth)
+func createBoxGeometry(dimension mgl.Vec3) *go_world.Geometry {
+	vertices := CreateBoxVertices(dimension.X(), dimension.Y(), dimension.Z())
 	geometry := go_world.NewGeometry(vertices)
 	geometry.SetDrawMethod(gl.TRIANGLES)
 	return geometry

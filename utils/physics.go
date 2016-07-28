@@ -9,7 +9,7 @@ import (
 var G float64 = 9.81
 var K float64 = 155
 var B float64 = 1.141
-var FRICTION float64 = 0.1
+var FRICTION float64 = 0.6
 
 /*
 Default implementations for the physics stuff

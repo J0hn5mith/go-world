@@ -108,6 +108,8 @@ func (physics *Physics) updateVelocity(timeDelta float64) {
             // TODO: Shift to better place, makes no sense that's here
             shift := new_cm.Sub(cm)
             body.ShiftBoundingSpheres(shift)
+            body.Object().SetPosition(cm)
+            body.Object().Rotate(rotation.Mat4())
 		}
 	}
 }

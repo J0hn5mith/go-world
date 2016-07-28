@@ -84,6 +84,11 @@ func (body *RigidBody) ApplyForce(force mgl.Vec3) PhysicalBody {
 	return body
 }
 
+func (body *RigidBody) SetObject(object *go_world.Object) *RigidBody {
+    body.object = object
+	return body
+}
+
 func (body *RigidBody) Object() *go_world.Object {
 	return body.object
 }

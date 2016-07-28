@@ -143,7 +143,8 @@ func (spring *Spring) Apply() {
 /*
 Creates mass particles for a box object
 */
-func AddMassParticle(body PhysicalBody, x, y, z, diameter float64) {
+func AddMassParticle(body PhysicalBody, dimension mgl.Vec3,  diameter float64) {
+    x, y, z := dimension.Elem()
 	radius := diameter / 2
 	lenX := int(x / diameter)
 	lenY := int(y / diameter)

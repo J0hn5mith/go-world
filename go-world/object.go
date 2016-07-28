@@ -44,6 +44,11 @@ func (o *Object) ShiftPosition(shift mgl.Vec3) *Object {
     return o
 }
 
+func (object *Object) Rotate(rotation mgl.Mat4) *Object {
+    object.rotation = object.Rotation().Mul4(rotation)
+    return object
+}
+
 func (object *Object) RotateX(angle float64) *Object {
 	object.rotation = object.rotation.Mul4(mgl.HomogRotate3DX(angle))
 	object.dirty = true
