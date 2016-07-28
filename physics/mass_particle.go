@@ -2,7 +2,7 @@ package go_world_physics
 
 import (
 	mgl "github.com/go-gl/mathgl/mgl64"
-    "math"
+	"math"
 )
 
 type MassParticle struct {
@@ -143,53 +143,70 @@ func (spring *Spring) Apply() {
 /*
 Creates mass particles for a box object
 */
-func AddMassParticle2D(body PhysicalBody, x, y, diameter float64) {
+func AddMassParticle(body PhysicalBody, x, y, z, diameter float64) {
 	radius := diameter / 2
 	lenX := int(x / diameter)
 	lenY := int(y / diameter)
+	lenZ := int(z / diameter)
 	offsetX := x / 2
 	offsetY := y / 2
+	offsetZ := z / 2
 
 	// TODO: Consider rest of division
 	op := body.Position()
-	for x := 0; x < lenX; x++ {
-		for y := 0; y < lenY; y++ {
-			if (x == 0 || x == lenX-1) && (y == 0 || y == lenY-1) {
-				xPos := -offsetX + radius + float64(x)*diameter + op.X()
-				yPos := -offsetY + radius + float64(y)*diameter + op.Y()
-				radiusHalf := radius / 2
-				body.AddMassParticle(CreateMassParticle(xPos-radiusHalf, yPos-radiusHalf, 0, radiusHalf))
-				body.AddMassParticle(CreateMassParticle(xPos+radiusHalf, yPos-radiusHalf, 0, radiusHalf))
-				body.AddMassParticle(CreateMassParticle(xPos+radiusHalf, yPos+radiusHalf, 0, radiusHalf))
-				body.AddMassParticle(CreateMassParticle(xPos-radiusHalf, yPos+radiusHalf, 0, radiusHalf))
+	for z := 0; z < lenZ; z++ {
+		for x := 0; x < lenX; x++ {
+			for y := 0; y < lenY; y++ {
+				if (x == 0 || x == lenX-1) && (y == 0 || y == lenY-1) && (z == 0 || z == lenZ-1) {
+					xPos := -offsetX + radius + float64(x)*diameter + op.X()
+					yPos := -offsetY + radius + float64(y)*diameter + op.Y()
+					zPos := -offsetZ + radius + float64(z)*diameter + op.Z()
+					radiusHalf := radius / 2
+					body.AddMassParticle(CreateMassParticle(xPos-radiusHalf, yPos-radiusHalf, zPos, radiusHalf))
+					body.AddMassParticle(CreateMassParticle(xPos+radiusHalf, yPos-radiusHalf, zPos, radiusHalf))
+					body.AddMassParticle(CreateMassParticle(xPos+radiusHalf, yPos+radiusHalf, zPos, radiusHalf))
+					body.AddMassParticle(CreateMassParticle(xPos-radiusHalf, yPos+radiusHalf, zPos, radiusHalf))
 
-			} else {
-				xPos := -offsetX + radius + float64(x)*diameter + op.X()
-				yPos := -offsetY + radius + float64(y)*diameter + op.Y()
-				body.AddMassParticle(CreateMassParticle(xPos, yPos, 0, radius))
-				if x == 0 || x == lenX-1 {
-					if y != lenY-1 {
-						xPos := -offsetX + radius + float64(x)*diameter + op.X()
-						yPos := -offsetY + 2*radius + float64(y)*diameter + op.Y()
-						body.AddMassParticle(
-							CreateMassParticle(xPos, yPos, 0, radius),
-						)
+				} else {
+					xPos := -offsetX + radius + float64(x)*diameter + op.X()
+					yPos := -offsetY + radius + float64(y)*diameter + op.Y()
+					zPos := -offsetZ + radius + float64(z)*diameter + op.Z()
+					body.AddMassParticle(CreateMassParticle(xPos, yPos, zPos, radius))
+					if x == 0 || x == lenX-1 {
+						if y != lenY-1 {
+							xPos := -offsetX + radius + float64(x)*diameter + op.X()
+							yPos := -offsetY + 2*radius + float64(y)*diameter + op.Y()
+							body.AddMassParticle(
+								CreateMassParticle(xPos, yPos, zPos, radius),
+							)
+						}
+					}
+					if y == 0 || y == lenY-1 {
+						if x != lenX-1 {
+							xPos := -offsetX + 2*radius + float64(x)*diameter + op.X()
+							yPos := -offsetY + radius + float64(y)*diameter + op.Y()
+							zPos := -offsetZ + radius + float64(z)*diameter + op.Z()
+							body.AddMassParticle(
+								CreateMassParticle(xPos, yPos, zPos, radius),
+							)
+						}
 					}
 				}
-				if y == 0 || y == lenY-1 {
-					if x != lenX-1 {
-						xPos := -offsetX + 2*radius + float64(x)*diameter + op.X()
-						yPos := -offsetY + radius + float64(y)*diameter + op.Y()
-						body.AddMassParticle(
-							CreateMassParticle(xPos, yPos, 0, radius),
-						)
-					}
-				}
+				//if z == 0 || z == lenZ-1 {
+				//if z != lenZ-1 {
+				//xPos := -offsetX + radius + float64(x)*diameter + op.X()
+				//yPos := -offsetY + radius + float64(y)*diameter + op.Y()
+				//zPos := -offsetZ + 2*radius + float64(z)*diameter + op.Z()
+				//body.AddMassParticle(
+				//CreateMassParticle(xPos, yPos, zPos, radius),
+				//)
+				//}
+				//}
 			}
 		}
 	}
 	bsRadius := math.Sqrt(
-		math.Pow((x/2), 2) + math.Pow(y/2, 2),
+		math.Pow((x/2), 2) + math.Pow(y/2, 2) + math.Pow(z/2, 2),
 	)
 	body.AddBoundingSphere(&Sphere{mgl.Vec3{0, 0, 0}, bsRadius})
 }

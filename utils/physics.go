@@ -7,7 +7,7 @@ import (
 )
 
 var G float64 = 9.81
-var K float64 = 65
+var K float64 = 155
 var B float64 = 1.141
 var FRICTION float64 = 0.1
 
@@ -49,7 +49,7 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
 				for _, particleB := range bodyB.MassParticles() {
 					col := physics.DetectInterParticleCollision(particleA, particleB)
 					if col.Magnitude > 0 {
-                        mag := math.Pow(1 + col.Magnitude, 4) - 1
+                        mag := math.Pow(1 + col.Magnitude, 2) - 1
                         if !bodyA.Static() {
                             springForce := col.Direction.Mul( -K * -mag  - B * particleA.Velocity().Dot(col.Direction))
                             particleA.ApplyForce(springForce)

@@ -59,11 +59,9 @@ func SphereCollision(sphereA, sphereB *Sphere) Collision {
 Checks two particle for a collision
 */
 func DetectInterParticleCollision(particleA, particleB *MassParticle) Collision {
-	return CircleCollision(
-		particleA.Position(),
-		particleB.Position(),
-		particleA.Radius(),
-		particleB.Radius(),
+	return SphereCollision(
+		&Sphere{particleA.Position(), particleA.Radius()},
+		&Sphere{particleB.Position(), particleB.Radius()},
 	)
 }
 

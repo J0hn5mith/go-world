@@ -65,15 +65,15 @@ func (physics *Physics) RegisterBody(body *RigidBody) *Physics {
 
 func (physics *Physics) Update(timeDelta float64) {
 
-	physics.applySpringForces(timeDelta)
-	physics.applyForceFields(timeDelta)
-	physics.applyAirResistance(timeDelta)
-	physics.updateVelocity(timeDelta)
+    physics.applySpringForces(timeDelta)
+    physics.applyForceFields(timeDelta)
+    physics.applyAirResistance(timeDelta)
+    physics.updateVelocity(timeDelta)
 	physics.updatePosition(timeDelta)
 
-	if physics.collisionHandler != nil {
-		physics.collisionHandler.Apply(physics.bodies)
-	}
+    if physics.collisionHandler != nil {
+        physics.collisionHandler.Apply(physics.bodies)
+    }
 
 }
 
@@ -91,11 +91,11 @@ func (physics *Physics) updateVelocity(timeDelta float64) {
 	for _, body := range physics.bodies {
 		if !body.Static() {
 			cm := getCenterOfMass(body)
-			new_cm := getNewCenterOfMass(body, timeDelta)
-			rotation := getRotationMatrix(body, cm, new_cm, timeDelta)
+            new_cm := getNewCenterOfMass(body, timeDelta)
+            rotation := getRotationMatrix(body, cm, new_cm, timeDelta)
 			for _, particle := range body.MassParticles() {
 				goalPosition := particle.Position().Sub(cm)
-				goalPosition = mgl.TransformCoordinate(goalPosition, rotation.Mat4())
+                goalPosition = mgl.TransformCoordinate(goalPosition, rotation.Mat4())
 				goalPosition = goalPosition.Add(new_cm)
 				positionDelta := goalPosition.Sub(
 					particle.Position().Add(particle.Velocity().Mul(timeDelta)),
@@ -132,9 +132,6 @@ func getCenterOfMass(body *RigidBody) mgl.Vec3 {
 	}
 	return newCenter.Mul(1.0 / float64(len(body.MassParticles())))
 }
-
-//func implicitEuerl(particles, preivousPositions){
-//}
 
 /*
    Returns the rotation matrix for the next state of a body.
