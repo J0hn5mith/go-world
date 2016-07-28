@@ -1,12 +1,12 @@
 package go_world_physics
 import (
-    "github.com/go-gl/mathgl/mgl32"
+    mgl "github.com/go-gl/mathgl/mgl64"
 	"testing"
 )
 
 func TestOuterProductSum(t *testing.T) {
     //t.Skip()
-    points := []mgl32.Vec3{{1, 1, 1},{1,1,1}, {1,1,1}}
+    points := []mgl.Vec3{{1, 1, 1},{1,1,1}, {1,1,1}}
     check := outerProductSum(points, points)
     for _, value := range(check){
         if value != 3 {
@@ -18,7 +18,7 @@ func TestOuterProductSum(t *testing.T) {
 func TestExtractRotationMatrix(t *testing.T) {
     //t.Skip()
     // Simplest test
-    //matrix := mgl32.Mat3{
+    //matrix := mgl.Mat3{
         //1, 1, 1,
         //1, 1, 1,
         //1, 1, 1,
@@ -31,9 +31,9 @@ func TestExtractRotationMatrix(t *testing.T) {
     //}
 
     // Test for simple case
-    points_a := []mgl32.Vec3{{-1,0,0}, {1,0,0}}
-    points_b := []mgl32.Vec3{{0,1,0}, {0, -1, 0}}
-    matrix_result := mgl32.Mat3{
+    points_a := []mgl.Vec3{{-1,0,0}, {1,0,0}}
+    points_b := []mgl.Vec3{{0,1,0}, {0, -1, 0}}
+    matrix_result := mgl.Mat3{
         0, -1, 0,
         -1, 0, 0,
         0, 0, 1,
@@ -47,8 +47,8 @@ func TestExtractRotationMatrix(t *testing.T) {
     }
 
     // Test for slightly instable case
-    points_c := []mgl32.Vec3{{-0.19999996, -0.20000005, 0}}
-    points_d := []mgl32.Vec3{{-0.20000002, -0.20000005, 0}}
+    points_c := []mgl.Vec3{{-0.19999996, -0.20000005, 0}}
+    points_d := []mgl.Vec3{{-0.20000002, -0.20000005, 0}}
     tmp_3 := outerProductSum(points_c, points_d)
     check_3 := ExtractRotationFromMatrix(tmp_3)
     for _, value := range(check_3.Diag()){
@@ -58,6 +58,6 @@ func TestExtractRotationMatrix(t *testing.T) {
     }
 }
 
-//flatten3x3(matrix mgl32.Mat3) []float32{
+//flatten3x3(matrix mgl.Mat3) []float32{
     //for 
 //}

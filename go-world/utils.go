@@ -111,3 +111,7 @@ func ToFloat32Array(values64 []float64) []float32 {
 	}
 	return values32
 }
+
+func Round(value float64) float64 {
+    return mgl64.Round(value, 8)
+}

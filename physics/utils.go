@@ -7,7 +7,7 @@ import (
 	"github.com/gonum/matrix/mat64"
 )
 
-var NUM_OF_ROUNDING_DIGITS int = 7
+var NUM_OF_ROUNDING_DIGITS int = 5
 
 /*
    Extracts the rotation matrix regarding the point (0,0)

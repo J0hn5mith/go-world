@@ -1,6 +1,6 @@
 package go_world_physics
 import (
-    mgl "github.com/go-gl/mathgl/mgl32"
+    mgl "github.com/go-gl/mathgl/mgl64"
 	"testing"
 )
 

@@ -2,6 +2,7 @@ package go_world_physics
 
 import (
 	mgl "github.com/go-gl/mathgl/mgl64"
+    "go-world/go-world"
 )
 
 type Rectangle struct {
@@ -39,7 +40,7 @@ func CircleCollision(p1, p2 mgl.Vec3, r1, r2 float64) Collision {
 	magnitude := -(distance - (r1 + r2))
 	if magnitude > 0 {
 		normal := p1.Sub(p2).Normalize()
-		return Collision{normal, magnitude}
+		return Collision{normal, go_world.Round(magnitude)}
 	}
 	return Collision{mgl.Vec3{0, 0, 0}, 0}
 }
@@ -50,7 +51,7 @@ func SphereCollision(sphereA, sphereB *Sphere) Collision {
 	magnitude := -(distance - (sphereA.Radius + sphereB.Radius))
 	if magnitude > 0 {
 		normal := delta.Normalize()
-		return Collision{normal, magnitude}
+		return Collision{normal, go_world.Round(magnitude)}
 	}
 	return Collision{mgl.Vec3{0, 0, 0}, 0}
 }

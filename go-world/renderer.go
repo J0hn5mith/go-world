@@ -53,7 +53,7 @@ func (renderer *Renderer) render(scene *Scene) {
 		)
         r, g, b := Vec3To32(object.Geometry().Color()).Elem()
 		gl.Uniform3f(uniColor, r, g, b)
-		renderer.renderObject(object)
+		//renderer.renderObject(object)
 	}
 }
 

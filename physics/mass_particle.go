@@ -143,8 +143,8 @@ func (spring *Spring) Apply() {
 /*
 Creates mass particles for a box object
 */
-func AddMassParticle(body PhysicalBody, dimension mgl.Vec3,  diameter float64) {
-    x, y, z := dimension.Elem()
+func AddMassParticle(body PhysicalBody, dimension mgl.Vec3, diameter float64) {
+	x, y, z := dimension.Elem()
 	radius := diameter / 2
 	lenX := int(x / diameter)
 	lenY := int(y / diameter)
@@ -158,50 +158,56 @@ func AddMassParticle(body PhysicalBody, dimension mgl.Vec3,  diameter float64) {
 	for z := 0; z < lenZ; z++ {
 		for x := 0; x < lenX; x++ {
 			for y := 0; y < lenY; y++ {
-				if (x == 0 || x == lenX-1) && (y == 0 || y == lenY-1) && (z == 0 || z == lenZ-1) {
-					xPos := -offsetX + radius + float64(x)*diameter + op.X()
-					yPos := -offsetY + radius + float64(y)*diameter + op.Y()
-					zPos := -offsetZ + radius + float64(z)*diameter + op.Z()
-					radiusHalf := radius / 2
-					body.AddMassParticle(CreateMassParticle(xPos-radiusHalf, yPos-radiusHalf, zPos, radiusHalf))
-					body.AddMassParticle(CreateMassParticle(xPos+radiusHalf, yPos-radiusHalf, zPos, radiusHalf))
-					body.AddMassParticle(CreateMassParticle(xPos+radiusHalf, yPos+radiusHalf, zPos, radiusHalf))
-					body.AddMassParticle(CreateMassParticle(xPos-radiusHalf, yPos+radiusHalf, zPos, radiusHalf))
+				//if (x == 0 || x == lenX-1) && (y == 0 || y == lenY-1) && (z == 0 || z == lenZ-1) {
+					//xPos := -offsetX + radius + float64(x)*diameter + op.X()
+					//yPos := -offsetY + radius + float64(y)*diameter + op.Y()
+					//zPos := -offsetZ + radius + float64(z)*diameter + op.Z()
+					//radiusHalf := radius / 2
+					//body.AddMassParticle(CreateMassParticle(xPos-radiusHalf, yPos-radiusHalf, zPos, radiusHalf))
+					//body.AddMassParticle(CreateMassParticle(xPos+radiusHalf, yPos-radiusHalf, zPos, radiusHalf))
+					//body.AddMassParticle(CreateMassParticle(xPos+radiusHalf, yPos+radiusHalf, zPos, radiusHalf))
+					//body.AddMassParticle(CreateMassParticle(xPos-radiusHalf, yPos+radiusHalf, zPos, radiusHalf))
 
-				} else {
+				//} else {
 					xPos := -offsetX + radius + float64(x)*diameter + op.X()
 					yPos := -offsetY + radius + float64(y)*diameter + op.Y()
 					zPos := -offsetZ + radius + float64(z)*diameter + op.Z()
 					body.AddMassParticle(CreateMassParticle(xPos, yPos, zPos, radius))
-					if x == 0 || x == lenX-1 {
-						if y != lenY-1 {
-							xPos := -offsetX + radius + float64(x)*diameter + op.X()
-							yPos := -offsetY + 2*radius + float64(y)*diameter + op.Y()
-							body.AddMassParticle(
-								CreateMassParticle(xPos, yPos, zPos, radius),
-							)
-						}
-					}
-					if y == 0 || y == lenY-1 {
-						if x != lenX-1 {
-							xPos := -offsetX + 2*radius + float64(x)*diameter + op.X()
-							yPos := -offsetY + radius + float64(y)*diameter + op.Y()
-							zPos := -offsetZ + radius + float64(z)*diameter + op.Z()
-							body.AddMassParticle(
-								CreateMassParticle(xPos, yPos, zPos, radius),
-							)
-						}
-					}
-				}
-				//if z == 0 || z == lenZ-1 {
-				//if z != lenZ-1 {
-				//xPos := -offsetX + radius + float64(x)*diameter + op.X()
-				//yPos := -offsetY + radius + float64(y)*diameter + op.Y()
-				//zPos := -offsetZ + 2*radius + float64(z)*diameter + op.Z()
-				//body.AddMassParticle(
-				//CreateMassParticle(xPos, yPos, zPos, radius),
-				//)
-				//}
+					//if x == 0 || x == lenX-1 {
+						//if y != lenY-1 {
+							//if z != lenZ-1 {
+								//xPos := -offsetX + radius + float64(x)*diameter + op.X()
+								//yPos := -offsetY + 2*radius + float64(y)*diameter + op.Y()
+								//body.AddMassParticle(
+									//CreateMassParticle(xPos, yPos, zPos, radius),
+								//)
+							//}
+						//}
+					//}
+					//if y == 0 || y == lenY-1 {
+						//if x != lenX-1 {
+							//if z != lenZ-1 {
+								//xPos := -offsetX + 2*radius + float64(x)*diameter + op.X()
+								//yPos := -offsetY + radius + float64(y)*diameter + op.Y()
+								//zPos := -offsetZ + radius + float64(z)*diameter + op.Z()
+								//body.AddMassParticle(
+									//CreateMassParticle(xPos, yPos, zPos, radius),
+								//)
+							//}
+						//}
+					//}
+					//if z == 0 || z == lenZ-1 {
+						//if x != lenX-1 {
+							//if y != lenZ-1 {
+								//xPos := -offsetX + radius + float64(x)*diameter + op.X()
+								//yPos := -offsetY + radius + float64(y)*diameter + op.Y()
+								//zPos := -offsetZ + 2*radius + float64(z)*diameter + op.Z()
+								//body.AddMassParticle(
+									//CreateMassParticle(xPos, yPos, zPos, radius),
+								//)
+							//}
+						//}
+					//}
 				//}
 			}
 		}

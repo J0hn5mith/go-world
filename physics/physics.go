@@ -3,7 +3,6 @@ package go_world_physics
 import (
 	mgl "github.com/go-gl/mathgl/mgl64"
 	"go-world/go-world"
-    "fmt"
 )
 
 /*
@@ -44,7 +43,7 @@ type Physics struct {
 
 func NewPhysics() *Physics {
 	physics := new(Physics)
-	physics.airResistance = 0.9
+	physics.airResistance = 0.001
 	return physics
 }
 
@@ -165,8 +164,6 @@ func (physics *Physics) updatePosition(timeDelta float64) {
 func (physics *Physics) updatePositionBody(timeDelta float64, body PhysicalBody) {
 	for _, particle := range body.MassParticles() {
 		delta := particle.Velocity().Mul(timeDelta)
-        fmt.Println(particle.Velocity().Len())
-
 		particle.ShiftPosition(delta)
 	}
 }
@@ -184,12 +181,13 @@ func (physics *Physics) applyForceFields(timeDelta float64) {
 //TODO: Could this iteratoin be done using functional programming? Since I use
 //it twice
 func (physics *Physics) applyAirResistance(timeDelta float64) {
-	//for _, rigidBody := range physics.bodies {
-        //for _, particle := range rigidBody.MassParticles(){
-            //mag  := (1 - 1/((1 + particle.Velocity().Len())*(1 + particle.Velocity().Len())) 
-			//particle.SetVelocity(particle.Velocity().Mul(mag * physics.airResistance))
-        //}
-	//}
+    for _, rigidBody := range physics.bodies {
+        for _, particle := range rigidBody.MassParticles(){
+            velocity := particle.Velocity().Len()
+            resistance := particle.Velocity().Mul(-physics.airResistance * velocity * velocity)
+            particle.ApplyForce(resistance)
+        }
+    }
 }
 
 func (physics *Physics) applySpringForces(timeDelta float64) {
