@@ -6,9 +6,9 @@ import (
 )
 
 var G float64 = 9.81
-var K float64 = 220.00
-var B float64 = 1.000
-var FRICTION float64 = 0.1
+var K float64 = 200.00
+var B float64 = 1.5
+var FRICTION float64 = 0.0
 
 /*
 Default implementations for the physics stuff
@@ -59,8 +59,8 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
                                 -K*-mag - B*particleA.Velocity().Dot(col.Direction),
                             )
 							particleA.ApplyForce(springForce)
-							//friction := particleA.Velocity().Mul(-FRICTION)
-							//particleA.ApplyForce(friction)
+                            friction := particleA.Velocity().Mul(-FRICTION)
+                            particleA.ApplyForce(friction)
 
 						}
                         if !bodyB.Static() {
@@ -68,8 +68,8 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
                                 -K*mag - B*particleB.Velocity().Dot(col.Direction),
                             )
                             particleB.ApplyForce(springForce)
-                            //friction := particleB.Velocity().Mul(-FRICTION)
-                            //particleB.ApplyForce(friction)
+                            friction := particleB.Velocity().Mul(-FRICTION)
+                            particleB.ApplyForce(friction)
 
                         }
 					}
