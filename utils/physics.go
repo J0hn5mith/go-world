@@ -3,13 +3,11 @@ package go_world_utils
 import (
 	mgl "github.com/go-gl/mathgl/mgl64"
 	physics "go-world/physics"
-    "math"
-    "fmt"
 )
 
 var G float64 = 9.81
-var K float64 = 10.00
-var B float64 = 0.000
+var K float64 = 220.00
+var B float64 = 1.000
 var FRICTION float64 = 0.00000000
 
 /*
@@ -39,7 +37,7 @@ effect of inter body collision.
 func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.RigidBody) {
 
 	for i, bodyA := range bodies {
-        for _, bodyB := range bodies[i:] {
+        for _, bodyB := range bodies[i+1:] {
 			if len(physics.InterSphereCollisions(
 				bodyA.BoundingSpheres(), bodyB.BoundingSpheres(),
 			)) < 1 {
@@ -51,14 +49,18 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
 					if col.Magnitude > 0 {
 						mag := col.Magnitude
 						if !bodyA.Static() {
-							springForce := col.Direction.Mul(-K*-mag - B*particleA.Velocity().Dot(col.Direction))
+							springForce := col.Direction.Mul(
+                                -K*-mag - B*particleA.Velocity().Dot(col.Direction),
+                            )
 							particleA.ApplyForce(springForce)
 							//friction := particleA.Velocity().Mul(-FRICTION)
 							//particleA.ApplyForce(friction)
 
 						}
                         if !bodyB.Static() {
-                            springForce := col.Direction.Mul(-K*mag - B*particleB.Velocity().Dot(col.Direction))
+                            springForce := col.Direction.Mul(
+                                -K*mag - B*particleB.Velocity().Dot(col.Direction),
+                            )
                             particleB.ApplyForce(springForce)
                             //friction := particleB.Velocity().Mul(-FRICTION)
                             //particleB.ApplyForce(friction)

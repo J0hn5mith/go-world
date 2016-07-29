@@ -43,7 +43,7 @@ type Physics struct {
 
 func NewPhysics() *Physics {
 	physics := new(Physics)
-	physics.airResistance = 0.001
+	physics.airResistance = 0.00001
 	return physics
 }
 
@@ -109,7 +109,7 @@ func (physics *Physics) updateVelocity(timeDelta float64) {
             shift := new_cm.Sub(cm)
             body.ShiftBoundingSpheres(shift)
             body.Object().SetPosition(cm)
-            body.Object().Rotate(rotation.Mat4())
+            //body.Object().Rotate(rotation.Mat4())
 		}
 	}
 }

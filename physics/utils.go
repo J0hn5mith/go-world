@@ -1,13 +1,13 @@
 package go_world_physics
 
 import (
-	mgl "github.com/go-gl/mathgl/mgl64"
 	"github.com/go-gl/mathgl/mgl32"
+	mgl "github.com/go-gl/mathgl/mgl64"
 	"github.com/gonum/matrix"
 	"github.com/gonum/matrix/mat64"
 )
 
-var NUM_OF_ROUNDING_DIGITS int = 5
+var NUM_OF_ROUNDING_DIGITS int = 8
 
 /*
    Extracts the rotation matrix regarding the point (0,0)
@@ -23,19 +23,30 @@ func ExtractRotationFromMatrix(in_matrix mgl.Mat3) mgl.Mat3 {
 	var svd mat64.SVD
 	_ = svd.Factorize(m, matrix.SVDFull)
 
-	var u, v, rotation mat64.Dense
+	var u, v, tmp mat64.Dense
+
 	u.UFromSVD(&svd)
 	v.VFromSVD(&svd)
-	rotation.Mul(&u, &v)
+    vt := mat64.NewDense(3, 3, []float64{0,0,0,0,0,0,0,0,0})
+	for i := 0; i < 3; i++ {
+		for ii := 0; ii < 3; ii++ {
+            //u.Set(i, ii, mgl.Round(math.Abs(u.At(i, ii)), 4))
+            vt.Set(i, ii, mgl.Round(v.At(ii, i), 4))
+		}
+	}
+	rotation := mat64.NewDense(3,3, nil)
+	tmp.Mul(&u, vt)
+	//rotation.Copy(tmp.T())
+    rotation = &tmp
 
 	return arrayToMatrix(rotation.RawMatrix().Data)
 }
 
-func outerProductSum(old_positions, new_positions []mgl.Vec3) mgl.Mat3 {
+func outerProductSum(oldPositions, newPositions []mgl.Vec3) mgl.Mat3 {
 	a := mgl.Mat3{}
 
-	for i, old := range old_positions {
-		a = a.Add(old.OuterProd3(new_positions[i]))
+	for i, old := range oldPositions {
+		a = a.Add(old.OuterProd3(newPositions[i]))
 	}
 	for i, value := range a {
 		a[i] = mgl.Round(value, NUM_OF_ROUNDING_DIGITS)
