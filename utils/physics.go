@@ -7,8 +7,8 @@ import (
 
 var G float64 = 9.81
 var K float64 = 220.00
-var B float64 = 0.000
-var FRICTION float64 = 0.00000000
+var B float64 = 1.000
+var FRICTION float64 = 0.1
 
 /*
 Default implementations for the physics stuff
@@ -38,11 +38,17 @@ func (collisionHandler *BasicPhysicsCollisionHandler) Apply(bodies []*physics.Ri
 
 	for i, bodyA := range bodies {
         for _, bodyB := range bodies[i+1:] {
+
+            if bodyA.Static() && bodyB.Static(){
+                continue
+            }
+
 			if len(physics.InterSphereCollisions(
 				bodyA.BoundingSpheres(), bodyB.BoundingSpheres(),
 			)) < 1 {
 				continue
 			}
+
 			for _, particleA := range bodyA.MassParticles() {
 				for _, particleB := range bodyB.MassParticles() {
 					col := physics.DetectInterParticleCollision(particleA, particleB)
