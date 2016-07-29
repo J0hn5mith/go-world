@@ -7,7 +7,7 @@ import (
 
 var G float64 = 9.81
 var K float64 = 220.00
-var B float64 = 1.000
+var B float64 = 0.000
 var FRICTION float64 = 0.00000000
 
 /*
